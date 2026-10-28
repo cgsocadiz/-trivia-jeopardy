@@ -130,6 +130,14 @@ const Persistence = (function () {
   }
 
   /**
+   * Checks whether an admin draft exists
+   * @returns {boolean}
+   */
+  function hasAdminDraft() {
+    return !!loadAdminDraft();
+  }
+
+  /**
    * Saves active custom game content (categories, clues, settings) for the current browser
    * @param {object} gameData
    */
@@ -219,6 +227,7 @@ const Persistence = (function () {
     clearSession,
     saveAdminDraft,
     loadAdminDraft,
+    hasAdminDraft,
     clearAdminDraft,
     saveCustomGame,
     loadCustomGame,
