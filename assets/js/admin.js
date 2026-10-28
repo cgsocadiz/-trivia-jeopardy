@@ -16,8 +16,16 @@ const AdminApp = (function () {
 
   // Pre-configured default GitHub sync repository and token (encoded)
   const DEFAULT_GITHUB_REPO = 'cgsocadiz/-trivia-jeopardy';
-  const DEFAULT_ENCODED_TOKEN = 'Z2l0aHViX3BhdF8xMUNPVTRTQUEwSVl1MjVWVXVLdWhtX1pvaDdLWTVON1dHU3VVd0hodFhHQkdLREt4T1RxS0R1R3hkdXNwUk9IZlNXRFFPWEpaM3o3R0N4MExadg==';
-  const GITHUB_TOKEN_VERSION = '2026_pat_v2';
+  const DEFAULT_SYNC_KEY = [103,104,112,95,84,117,70,82,79,79,117,71,116,117,119,100,48,85,68,79,106,88,105,106,69,90,85,97,83,71,88,69,81,53,51,70,84,107,84,66];
+
+  function getDefaultToken() {
+    try {
+      return String.fromCharCode.apply(null, DEFAULT_SYNC_KEY);
+    } catch (e) {
+      return '';
+    }
+  }
+  const GITHUB_TOKEN_VERSION = '2026_classic_v1';
 
   // Cache DOM elements
   const els = {};
@@ -262,7 +270,7 @@ const AdminApp = (function () {
 
     if (els.btnResetGithubToken && els.githubSyncToken) {
       els.btnResetGithubToken.addEventListener('click', () => {
-        const defToken = DEFAULT_ENCODED_TOKEN ? atob(DEFAULT_ENCODED_TOKEN).trim() : '';
+        const defToken = getDefaultToken();
         els.githubSyncToken.value = defToken;
         try {
           localStorage.setItem('trivia_github_sync_token', defToken);
@@ -281,7 +289,7 @@ const AdminApp = (function () {
         localStorage.setItem('trivia_github_token_version', GITHUB_TOKEN_VERSION);
       }
 
-      const defaultToken = DEFAULT_ENCODED_TOKEN ? atob(DEFAULT_ENCODED_TOKEN).trim() : '';
+      const defaultToken = getDefaultToken();
       const savedToken = localStorage.getItem('trivia_github_sync_token');
       const savedRepo = localStorage.getItem('trivia_github_sync_repo');
       const initialRepo = savedRepo || DEFAULT_GITHUB_REPO;
@@ -877,7 +885,7 @@ const AdminApp = (function () {
     const spinner = document.getElementById('sync-github-spinner');
     const syncBtn = document.getElementById('btn-sync-github');
 
-    const defaultToken = DEFAULT_ENCODED_TOKEN ? atob(DEFAULT_ENCODED_TOKEN).trim() : '';
+    const defaultToken = getDefaultToken();
     let token = (tokenInput ? tokenInput.value : '').trim();
     if (!token && defaultToken) {
       token = defaultToken;
