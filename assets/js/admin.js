@@ -507,13 +507,13 @@ const AdminApp = (function () {
 
     if (!currentRound || !currentRound.categories || currentRound.categories.length === 0) {
       if (els.categoriesList) {
-        els.categoriesList.innerHTML = '<div class="text-muted p-3">No categories in this round yet. Click "+ Add Category".</div>';
+        els.categoriesList.innerHTML = '<div class="text-muted p-3 text-center small">No categories in this round yet. Click "+ Add Category".</div>';
       }
       return;
     }
 
     currentRound.categories.forEach((cat, idx) => {
-      // Dropdown option
+      // Hidden dropdown option for sync
       if (els.categorySelector) {
         const opt = document.createElement('option');
         opt.value = idx;
@@ -525,28 +525,39 @@ const AdminApp = (function () {
       // Categories management card in list
       if (els.categoriesList) {
         const item = document.createElement('div');
-        item.className = 'list-group-item d-flex justify-content-between align-items-center bg-dark text-light border-secondary mb-1 rounded';
+        const isActive = idx === currentCategoryIdx;
+        item.className = `list-group-item d-flex justify-content-between align-items-center mb-2 rounded category-item-row ${isActive ? 'category-item-active' : ''}`;
         item.innerHTML = `
-          <div>
-            <span class="badge bg-primary me-2">${idx + 1}</span>
-            <strong class="category-name-display">${escapeHtml(cat.name)}</strong>
-            <small class="text-muted ms-2">(${cat.clues ? cat.clues.length : 0} clues)</small>
+          <div class="d-flex align-items-center gap-2 flex-grow-1 me-2" style="cursor: pointer; min-width: 0;">
+            <span class="badge ${isActive ? 'bg-primary' : 'bg-secondary'} rounded-pill">${idx + 1}</span>
+            <div class="text-truncate">
+              <div class="fw-bold category-name-display text-truncate">${escapeHtml(cat.name)}</div>
+              <small class="text-muted">${cat.clues ? cat.clues.length : 0} clues</small>
+            </div>
           </div>
-          <div class="btn-group btn-group-sm">
-            <button class="btn btn-outline-info btn-move-cat-up" data-idx="${idx}" title="Move Up" ${idx === 0 ? 'disabled' : ''}>
-              <i class="bi bi-arrow-up"></i>
+          <div class="btn-group btn-group-sm flex-shrink-0">
+            <button class="btn btn-outline-secondary btn-move-cat-up py-1 px-2" data-idx="${idx}" title="Move Up" ${idx === 0 ? 'disabled' : ''}>
+              <i class="bi bi-chevron-up"></i>
             </button>
-            <button class="btn btn-outline-info btn-move-cat-down" data-idx="${idx}" title="Move Down" ${idx === currentRound.categories.length - 1 ? 'disabled' : ''}>
-              <i class="bi bi-arrow-down"></i>
+            <button class="btn btn-outline-secondary btn-move-cat-down py-1 px-2" data-idx="${idx}" title="Move Down" ${idx === currentRound.categories.length - 1 ? 'disabled' : ''}>
+              <i class="bi bi-chevron-down"></i>
             </button>
-            <button class="btn btn-outline-warning btn-rename-cat" data-idx="${idx}" title="Rename">
+            <button class="btn btn-outline-warning btn-rename-cat py-1 px-2" data-idx="${idx}" title="Rename">
               <i class="bi bi-pencil"></i>
             </button>
-            <button class="btn btn-outline-danger btn-delete-cat" data-idx="${idx}" title="Delete">
+            <button class="btn btn-outline-danger btn-delete-cat py-1 px-2" data-idx="${idx}" title="Delete">
               <i class="bi bi-trash"></i>
             </button>
           </div>
         `;
+
+        item.addEventListener('click', (e) => {
+          if (e.target.closest('button')) return;
+          currentCategoryIdx = idx;
+          if (els.categorySelector) els.categorySelector.value = idx;
+          renderCategories();
+          renderClues();
+        });
 
         // Bind buttons
         item.querySelector('.btn-move-cat-up').addEventListener('click', () => moveCategory(idx, -1));
@@ -560,17 +571,29 @@ const AdminApp = (function () {
   }
 
   function renderClues() {
+    const selectedHeader = document.getElementById('selected-category-header-title');
     if (!els.cluesTableBody || !editorData || !editorData.game) return;
     const rounds = editorData.game.rounds || [];
     const currentRound = rounds[currentRoundIdx];
     if (!currentRound || !currentRound.categories || currentRound.categories.length === 0) {
-      els.cluesTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No categories available. Add a category first.</td></tr>';
+      els.cluesTableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No categories available in this round. Click "+ Add Category" to start.</td></tr>';
+      if (selectedHeader) selectedHeader.textContent = 'No category selected';
       return;
     }
 
     const currentCat = currentRound.categories[currentCategoryIdx];
-    if (!currentCat || !currentCat.clues || currentCat.clues.length === 0) {
-      els.cluesTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No clues in this category. Click "+ Add Clue" to create one.</td></tr>';
+    if (!currentCat) {
+      if (selectedHeader) selectedHeader.textContent = 'No category selected';
+      els.cluesTableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Select a category on the left to view clues.</td></tr>';
+      return;
+    }
+
+    if (selectedHeader) {
+      selectedHeader.textContent = `${currentCat.name} (${currentCat.clues ? currentCat.clues.length : 0} clues)`;
+    }
+
+    if (!currentCat.clues || currentCat.clues.length === 0) {
+      els.cluesTableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No clues in this category yet. Click "+ Add Clue" above to add one.</td></tr>';
       return;
     }
 
@@ -578,35 +601,32 @@ const AdminApp = (function () {
     currentCat.clues.forEach((clue, idx) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td class="fw-bold text-warning">$${clue.points}</td>
+        <td class="fw-bold text-warning text-nowrap">$${clue.points}</td>
         <td>
-          <div class="text-truncate" style="max-width: 320px;" title="${escapeHtml(clue.clue)}">${escapeHtml(clue.clue)}</div>
+          <div class="clue-preview-text" title="${escapeHtml(clue.clue)}">${escapeHtml(clue.clue)}</div>
         </td>
         <td>
-          <div class="text-truncate text-success" style="max-width: 220px;" title="${escapeHtml(clue.answer)}">${escapeHtml(clue.answer)}</div>
+          <div class="clue-preview-answer text-success fw-semibold" title="${escapeHtml(clue.answer)}">${escapeHtml(clue.answer)}</div>
         </td>
         <td class="text-center">
-          ${clue.dailyDouble ? '<span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> DD</span>' : '<span class="text-muted">—</span>'}
+          ${clue.dailyDouble ? '<span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> DD</span>' : '<span class="text-muted small">—</span>'}
         </td>
-        <td>
-          <small class="text-muted">${clue.id}</small>
-        </td>
-        <td class="text-end">
+        <td class="text-end text-nowrap">
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-outline-info btn-move-clue-up" title="Move Up" ${idx === 0 ? 'disabled' : ''}>
-              <i class="bi bi-arrow-up"></i>
+            <button class="btn btn-outline-secondary btn-move-clue-up py-1 px-2" title="Move Up" ${idx === 0 ? 'disabled' : ''}>
+              <i class="bi bi-chevron-up"></i>
             </button>
-            <button class="btn btn-outline-info btn-move-clue-down" title="Move Down" ${idx === currentCat.clues.length - 1 ? 'disabled' : ''}>
-              <i class="bi bi-arrow-down"></i>
+            <button class="btn btn-outline-secondary btn-move-clue-down py-1 px-2" title="Move Down" ${idx === currentCat.clues.length - 1 ? 'disabled' : ''}>
+              <i class="bi bi-chevron-down"></i>
             </button>
-            <button class="btn btn-outline-primary btn-edit-clue" title="Edit">
-              <i class="bi bi-pencil"></i>
+            <button class="btn btn-outline-primary btn-edit-clue py-1 px-2" title="Edit Clue">
+              <i class="bi bi-pencil-fill"></i>
             </button>
-            <button class="btn btn-outline-light btn-duplicate-clue" title="Duplicate">
+            <button class="btn btn-outline-secondary btn-duplicate-clue py-1 px-2" title="Duplicate Clue">
               <i class="bi bi-files"></i>
             </button>
-            <button class="btn btn-outline-danger btn-delete-clue" title="Delete">
-              <i class="bi bi-trash"></i>
+            <button class="btn btn-outline-danger btn-delete-clue py-1 px-2" title="Delete Clue">
+              <i class="bi bi-trash-fill"></i>
             </button>
           </div>
         </td>

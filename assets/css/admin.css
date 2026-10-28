@@ -1,27 +1,35 @@
 /**
  * Trivia Jeopardy - Administration Panel Stylesheet
- * Practical CMS dashboard layout with light/dark mode support and semi-transparent modal backdrops.
+ * Minimal, modern CMS dashboard layout with light/dark theme support and semi-transparent modal backdrops.
  */
 
 :root {
-  --admin-bg: #0b1329;
-  --admin-surface: #111e3f;
-  --admin-surface-card: #162650;
-  --admin-border: #1e366a;
-  --admin-text: #f1f5f9;
+  --admin-bg: #090e1f;
+  --admin-surface: #101935;
+  --admin-surface-card: #16244c;
+  --admin-surface-hover: #1c2e61;
+  --admin-border: #1e356c;
+  --admin-text: #f8fafc;
   --admin-text-muted: #94a3b8;
-  --admin-accent: #3b82f6;
-  --admin-sidebar-width: 240px;
+  --admin-accent: #2563eb;
+  --admin-accent-hover: #1d4ed8;
+  --admin-success: #16a34a;
+  --admin-gold: #fbbf24;
 }
 
-[data-bs-theme="light"] {
+[data-bs-theme="light"],
+body.theme-light {
   --admin-bg: #f8fafc;
   --admin-surface: #ffffff;
   --admin-surface-card: #f1f5f9;
+  --admin-surface-hover: #e2e8f0;
   --admin-border: #cbd5e1;
   --admin-text: #0f172a;
   --admin-text-muted: #64748b;
   --admin-accent: #2563eb;
+  --admin-accent-hover: #1d4ed8;
+  --admin-success: #15803d;
+  --admin-gold: #b45309;
 }
 
 body {
@@ -29,11 +37,12 @@ body {
   color: var(--admin-text);
   min-height: 100vh;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
 }
 
 /* Semi-transparent modal backdrops without blur per user instruction */
 .modal-backdrop {
-  background-color: rgba(4, 9, 24, 0.82) !important;
+  background-color: rgba(4, 9, 24, 0.85) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -42,11 +51,16 @@ body {
   background-color: var(--admin-surface) !important;
   color: var(--admin-text) !important;
   border: 1px solid var(--admin-border) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
+.modal-header, .modal-footer {
+  border-color: var(--admin-border) !important;
 }
 
 /* Admin Login Card */
 .admin-login-wrapper {
-  min-height: 85vh;
+  min-height: 90vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,11 +69,11 @@ body {
 
 .admin-login-card {
   width: 100%;
-  max-width: 440px;
+  max-width: 420px;
   background-color: var(--admin-surface);
   border: 1px solid var(--admin-border);
-  border-radius: 12px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
 }
 
 /* Admin Dashboard Topbar & Navigation */
@@ -67,25 +81,34 @@ body {
   background-color: var(--admin-surface);
   border-bottom: 1px solid var(--admin-border);
   padding: 0.75rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+
+.admin-brand {
+  letter-spacing: -0.02em;
 }
 
 .admin-nav-bar {
   background-color: var(--admin-surface);
   border-bottom: 1px solid var(--admin-border);
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.25rem;
   overflow-x: auto;
   white-space: nowrap;
+  scrollbar-width: thin;
 }
 
 .admin-nav-btn {
   color: var(--admin-text-muted);
   font-weight: 600;
-  border-radius: 6px;
-  padding: 0.5rem 0.9rem;
-  margin-right: 0.35rem;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  padding: 0.5rem 0.95rem;
   transition: all 0.15s ease;
   border: 1px solid transparent;
   background: transparent;
+  cursor: pointer;
 }
 
 .admin-nav-btn:hover {
@@ -96,11 +119,12 @@ body {
 .admin-nav-btn.active {
   color: #ffffff !important;
   background-color: var(--admin-accent) !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
 }
 
 /* Admin Content Layout */
 .admin-container {
-  max-width: 1350px;
+  max-width: 1380px;
   margin: 0 auto;
   padding: 1.5rem 1rem;
 }
@@ -108,36 +132,81 @@ body {
 .admin-card {
   background-color: var(--admin-surface);
   border: 1px solid var(--admin-border);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 1.25rem;
   margin-bottom: 1.25rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .admin-card-header {
   border-bottom: 1px solid var(--admin-border);
-  padding-bottom: 0.75rem;
+  padding-bottom: 0.85rem;
   margin-bottom: 1rem;
 }
 
-/* Tables in Admin */
+/* Category Item Rows in List */
+.category-item-row {
+  cursor: pointer;
+  background-color: var(--admin-surface-card) !important;
+  border: 1px solid var(--admin-border) !important;
+  color: var(--admin-text) !important;
+  transition: all 0.15s ease;
+  border-left: 4px solid transparent !important;
+}
+
+.category-item-row:hover {
+  background-color: var(--admin-surface-hover) !important;
+  border-color: var(--admin-accent) !important;
+}
+
+.category-item-active {
+  background-color: var(--admin-surface-hover) !important;
+  border-left: 4px solid var(--admin-accent) !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+/* Clues Table Styling */
 .admin-table {
   color: var(--admin-text);
   background-color: transparent;
+  margin-bottom: 0;
 }
 
 .admin-table th {
   background-color: var(--admin-surface-card);
   color: var(--admin-text-muted);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-color: var(--admin-border);
+  padding: 0.75rem 0.85rem;
 }
 
 .admin-table td {
   border-color: var(--admin-border);
   vertical-align: middle;
+  padding: 0.75rem 0.85rem;
+}
+
+.admin-table tbody tr:hover {
+  background-color: var(--admin-surface-card);
+}
+
+.clue-preview-text {
+  font-weight: 500;
+  color: var(--admin-text);
+  max-width: 420px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clue-preview-answer {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Form Controls */
@@ -145,25 +214,113 @@ body {
   background-color: var(--admin-surface-card) !important;
   color: var(--admin-text) !important;
   border-color: var(--admin-border) !important;
+  border-radius: 8px;
 }
 
 .form-control:focus, .form-select:focus {
   border-color: var(--admin-accent) !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25) !important;
 }
 
-/* Preview tile styling inside admin */
-.preview-tile {
-  cursor: default !important;
+.form-check-input {
+  background-color: var(--admin-surface-card);
+  border-color: var(--admin-border);
+}
+
+.form-check-input:checked {
+  background-color: var(--admin-accent);
+  border-color: var(--admin-accent);
+}
+
+/* Advanced Settings Collapsible */
+.admin-advanced-details {
+  border: 1px dashed var(--admin-border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  background-color: rgba(22, 36, 76, 0.3);
+}
+
+.admin-advanced-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--admin-text-muted);
   user-select: none;
 }
 
+.admin-advanced-details summary:hover {
+  color: var(--admin-text);
+}
+
+/* Preview Board Inside Admin */
+.trivia-board-table {
+  display: grid;
+  grid-template-columns: repeat(var(--board-columns, 6), minmax(130px, 1fr));
+  gap: 8px;
+  background-color: #040918;
+  padding: 12px;
+  border-radius: 10px;
+  border: 2px solid #060ce9;
+  overflow-x: auto;
+}
+
+.category-header {
+  background: linear-gradient(180deg, #0712a8 0%, #060ce9 100%);
+  color: #ffffff;
+  font-weight: 900;
+  text-align: center;
+  padding: 12px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+}
+
+.preview-tile {
+  background: #060ce9;
+  color: #ffcc00;
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-align: center;
+  padding: 18px 8px;
+  border-radius: 4px;
+  cursor: default !important;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 65px;
+}
+
+.empty-tile {
+  background: rgba(6, 12, 233, 0.15);
+  border: 1px dashed #1e356c;
+  border-radius: 4px;
+  min-height: 65px;
+}
+
 /* Responsive adjustments */
+@media (max-width: 991px) {
+  .clue-preview-text {
+    max-width: 250px;
+  }
+  .clue-preview-answer {
+    max-width: 160px;
+  }
+}
+
 @media (max-width: 768px) {
   .admin-topbar {
-    padding: 0.75rem 1rem;
+    padding: 0.65rem 1rem;
   }
   .admin-container {
     padding: 1rem 0.5rem;
+  }
+  .admin-card {
+    padding: 1rem;
+    border-radius: 10px;
   }
 }
