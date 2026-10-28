@@ -72,6 +72,15 @@ const AdminApp = (function () {
     els.validationSummary = document.getElementById('validation-summary');
     els.previewBoardContainer = document.getElementById('admin-preview-board');
 
+    // Save Settings Button
+    els.saveSettingsBtn = document.getElementById('btn-save-settings');
+
+    // GitHub Cloud Sync
+    els.btnSyncGitHub = document.getElementById('btn-sync-github');
+    els.githubSyncToken = document.getElementById('github-sync-token');
+    els.githubSyncRepo = document.getElementById('github-sync-repo');
+    els.btnToggleGithubToken = document.getElementById('btn-toggle-github-token');
+
     // Password change modal
     els.changePasswordForm = document.getElementById('change-password-form');
     els.newPasswordInput = document.getElementById('new-admin-password');
@@ -221,6 +230,32 @@ const AdminApp = (function () {
     if (els.changePasswordForm) {
       els.changePasswordForm.addEventListener('submit', handleChangePassword);
     }
+
+    // Save Game Settings Button
+    if (els.saveSettingsBtn) {
+      els.saveSettingsBtn.addEventListener('click', handleSaveSettings);
+    }
+
+    // GitHub Sync
+    if (els.btnSyncGitHub) {
+      els.btnSyncGitHub.addEventListener('click', handleSyncGitHub);
+    }
+    if (els.btnToggleGithubToken && els.githubSyncToken) {
+      els.btnToggleGithubToken.addEventListener('click', () => {
+        const isPass = els.githubSyncToken.type === 'password';
+        els.githubSyncToken.type = isPass ? 'text' : 'password';
+        const icon = els.btnToggleGithubToken.querySelector('i');
+        if (icon) icon.className = isPass ? 'bi bi-eye-slash' : 'bi bi-eye';
+      });
+    }
+
+    // Load saved GitHub token & repo from localStorage if available
+    try {
+      const savedToken = localStorage.getItem('trivia_github_sync_token');
+      const savedRepo = localStorage.getItem('trivia_github_sync_repo');
+      if (savedToken && els.githubSyncToken) els.githubSyncToken.value = savedToken;
+      if (savedRepo && els.githubSyncRepo) els.githubSyncRepo.value = savedRepo;
+    } catch (e) {}
   }
 
   /**
@@ -289,7 +324,18 @@ const AdminApp = (function () {
 
       if (authResult.success) {
         isAuthenticated = true;
-        editorData = JSON.parse(JSON.stringify(rawSourceData));
+
+        // Auto-restore previously saved edits from localStorage so user never loses their changes on refresh
+        const savedCustom = Persistence.loadCustomGame();
+        const savedDraft = Persistence.loadAdminDraft();
+        if (savedCustom && savedCustom.game) {
+          editorData = JSON.parse(JSON.stringify(savedCustom));
+        } else if (savedDraft && savedDraft.game) {
+          editorData = JSON.parse(JSON.stringify(rawSourceData));
+          editorData.game = JSON.parse(JSON.stringify(savedDraft.game));
+        } else {
+          editorData = JSON.parse(JSON.stringify(rawSourceData));
+        }
 
         // Hide login, show dashboard
         els.loginSection.classList.add('d-none');
@@ -297,6 +343,9 @@ const AdminApp = (function () {
         els.passwordInput.value = '';
 
         initializeDashboard();
+        if (savedCustom || savedDraft) {
+          setDraftBadge('Loaded saved local edits');
+        }
       } else {
         showLoginError(authResult.error || 'Invalid administrator password.');
       }
@@ -756,7 +805,135 @@ const AdminApp = (function () {
   function triggerAutoSave() {
     if (!editorData) return;
     Persistence.saveAdminDraft(editorData);
-    setDraftBadge('Draft saved at ' + new Date().toLocaleTimeString());
+    Persistence.saveCustomGame(editorData);
+    setDraftBadge('Saved to browser at ' + new Date().toLocaleTimeString());
+  }
+
+  function handleSaveSettings() {
+    if (!editorData || !editorData.game) return;
+
+    if (els.gameTitleInput) {
+      editorData.game.title = els.gameTitleInput.value.trim() || 'Trivia Jeopardy';
+      if (els.gameTitleHeader) els.gameTitleHeader.textContent = editorData.game.title;
+    }
+
+    if (!editorData.game.settings) editorData.game.settings = {};
+    if (els.settingDeduction) editorData.game.settings.incorrectAnswerDeduction = els.settingDeduction.checked;
+    if (els.settingQuestionForm) editorData.game.settings.requireQuestionForm = els.settingQuestionForm.checked;
+    if (els.settingDailyDouble) editorData.game.settings.dailyDoubleEnabled = els.settingDailyDouble.checked;
+    if (els.settingFinalJeopardy) editorData.game.settings.finalJeopardyEnabled = els.settingFinalJeopardy.checked;
+    if (els.settingSound) editorData.game.settings.soundEnabled = els.settingSound.checked;
+    if (els.settingTimerSeconds) editorData.game.settings.timerSeconds = parseInt(els.settingTimerSeconds.value, 10) || 30;
+
+    Persistence.saveCustomGame(editorData);
+    Persistence.saveAdminDraft(editorData);
+    setDraftBadge('Settings saved at ' + new Date().toLocaleTimeString());
+
+    const feedback = document.getElementById('settings-saved-feedback');
+    if (feedback) {
+      feedback.classList.remove('d-none');
+      setTimeout(() => feedback.classList.add('d-none'), 3500);
+    }
+
+    showAppModal(
+      'Settings Saved',
+      'Your game settings have been successfully saved to your browser storage!\n\nTo make these changes available on another computer, projector, or mobile device, go to the "Import & Export" tab and click "Sync to GitHub" or "Export questions.json".',
+      'success'
+    );
+  }
+
+  // --- GitHub Cloud Sync (Deploy to All Devices) ---
+  async function handleSyncGitHub() {
+    const tokenInput = document.getElementById('github-sync-token');
+    const repoInput = document.getElementById('github-sync-repo');
+    const spinner = document.getElementById('sync-github-spinner');
+    const syncBtn = document.getElementById('btn-sync-github');
+
+    const token = (tokenInput ? tokenInput.value : '').trim();
+    const repo = (repoInput ? repoInput.value : '').trim();
+
+    if (!repo || !repo.includes('/')) {
+      showAppModal('Invalid Repository', 'Please enter a valid repository in the format "owner/repo" (e.g. cgsocadiz/-trivia-jeopardy).', 'warning');
+      return;
+    }
+
+    if (!token) {
+      showAppModal(
+        'GitHub Token Required',
+        'To push updates directly from your browser to GitHub, please enter a GitHub Personal Access Token (PAT) with "Contents: Read and write" permission.\n\nAlternatively, you can click "Export questions.json" below, copy it into assets/data/questions.json, and run "git commit && git push" from your terminal.',
+        'info'
+      );
+      return;
+    }
+
+    try {
+      localStorage.setItem('trivia_github_sync_token', token);
+      localStorage.setItem('trivia_github_sync_repo', repo);
+    } catch (e) {}
+
+    syncBtn.disabled = true;
+    if (spinner) spinner.classList.remove('d-none');
+
+    try {
+      const fileUrl = `https://api.github.com/repos/${repo}/contents/assets/data/questions.json`;
+      const getResp = await fetch(fileUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
+      let currentSha = null;
+      if (getResp.ok) {
+        const fileInfo = await getResp.json();
+        currentSha = fileInfo.sha;
+      }
+
+      const jsonString = JSON.stringify(editorData, null, 2);
+      const encoder = new TextEncoder();
+      const bytes = encoder.encode(jsonString);
+      let binary = '';
+      bytes.forEach(b => { binary += String.fromCharCode(b); });
+      const base64Content = btoa(binary);
+
+      const putBody = {
+        message: 'feat: update questions and settings via Admin CMS',
+        content: base64Content
+      };
+      if (currentSha) {
+        putBody.sha = currentSha;
+      }
+
+      const putResp = await fetch(fileUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(putBody)
+      });
+
+      if (!putResp.ok) {
+        const errJson = await putResp.json().catch(() => ({}));
+        throw new Error(errJson.message || `HTTP ${putResp.status} ${putResp.statusText}`);
+      }
+
+      showAppModal(
+        'Synced to GitHub!',
+        'Your questions and settings were successfully committed to your GitHub repository!\n\nGitHub Pages will redeploy in ~30-60 seconds. Once completed, your updates will be live and accessible from ANY computer, projector, or mobile device at:\nhttps://cgsocadiz.github.io/-trivia-jeopardy/',
+        'success'
+      );
+    } catch (err) {
+      showAppModal(
+        'Sync Failed',
+        `Could not update GitHub repository: ${err.message}\n\nPlease check that your Personal Access Token has "Contents: Read and write" permissions for repository ${repo}.\n\nYou can also download the file via "Export questions.json" and push via Git CLI.`,
+        'danger'
+      );
+    } finally {
+      syncBtn.disabled = false;
+      if (spinner) spinner.classList.add('d-none');
+    }
   }
 
   function setDraftBadge(text) {

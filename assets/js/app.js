@@ -95,6 +95,16 @@ const App = (function () {
 
   // --- Data Loading ---
   async function loadGameData() {
+    // 1. First check if customized game data is saved in this browser
+    const customData = Persistence.loadCustomGame();
+    if (customData && customData.game && Array.isArray(customData.game.rounds)) {
+      GameState.setGameData(customData);
+      renderHomePreview();
+      checkSavedSession();
+      return;
+    }
+
+    // 2. Otherwise load published questions.json
     try {
       const resp = await fetch('assets/data/questions.json');
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);

@@ -9,6 +9,7 @@ const Persistence = (function () {
   const STORAGE_KEYS = {
     SESSION: 'trivia_jeopardy_session_v1',
     ADMIN_DRAFT: 'trivia_jeopardy_admin_draft_v1',
+    CUSTOM_GAME: 'trivia_jeopardy_custom_game_v1',
     PREFERENCES: 'trivia_jeopardy_user_prefs_v1'
   };
 
@@ -129,6 +130,52 @@ const Persistence = (function () {
   }
 
   /**
+   * Saves active custom game content (categories, clues, settings) for the current browser
+   * @param {object} gameData
+   */
+  function saveCustomGame(gameData) {
+    if (!isStorageAvailable() || !gameData) return;
+    try {
+      localStorage.setItem(STORAGE_KEYS.CUSTOM_GAME, JSON.stringify(gameData));
+    } catch (e) {
+      console.warn('Failed to save custom game data:', e);
+    }
+  }
+
+  /**
+   * Loads custom game content from local storage
+   * @returns {object|null}
+   */
+  function loadCustomGame() {
+    if (!isStorageAvailable()) return null;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEYS.CUSTOM_GAME);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /**
+   * Checks if custom game data exists
+   * @returns {boolean}
+   */
+  function hasCustomGame() {
+    return !!loadCustomGame();
+  }
+
+  /**
+   * Clears saved custom game data
+   */
+  function clearCustomGame() {
+    if (!isStorageAvailable()) return;
+    try {
+      localStorage.removeItem(STORAGE_KEYS.CUSTOM_GAME);
+    } catch (e) {}
+  }
+
+  /**
    * Clears admin draft
    */
   function clearAdminDraft() {
@@ -173,6 +220,10 @@ const Persistence = (function () {
     saveAdminDraft,
     loadAdminDraft,
     clearAdminDraft,
+    saveCustomGame,
+    loadCustomGame,
+    hasCustomGame,
+    clearCustomGame,
     savePreferences,
     loadPreferences
   };

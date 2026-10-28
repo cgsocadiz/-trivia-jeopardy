@@ -44,11 +44,6 @@
         </button>
       </form>
 
-      <div class="bg-dark p-3 rounded border border-secondary text-muted small">
-        <div class="fw-bold text-light mb-1"><i class="bi bi-info-circle me-1"></i>Default Credentials Note:</div>
-        Default password is <code>admin</code>. You can change this anytime from inside the admin panel or by running <code>node scripts/generate-password-hash.js</code>.
-      </div>
-
       <div class="text-center mt-3">
         <a href="index.html" class="text-secondary text-decoration-none small">
           <i class="bi bi-arrow-left me-1"></i> Return to Game
@@ -249,6 +244,16 @@
                 </label>
               </div>
             </div>
+
+            <!-- Save Settings Button -->
+            <div class="col-12 text-end pt-3 border-top border-secondary">
+              <span class="text-success small fw-bold me-3 d-none" id="settings-saved-feedback">
+                <i class="bi bi-check-circle-fill me-1"></i> Settings saved to browser storage!
+              </span>
+              <button type="button" class="btn btn-success btn-lg px-4 fw-bold" id="btn-save-settings">
+                <i class="bi bi-check-circle-fill me-1"></i> Save Game Settings
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -307,6 +312,40 @@
 
       <!-- TAB 6: IMPORT & EXPORT -->
       <section id="tab-io" class="admin-tab-pane d-none">
+        <!-- Cloud Sync Card -->
+        <div class="admin-card mb-4 border-primary">
+          <div class="admin-card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold text-primary"><i class="bi bi-cloud-arrow-up-fill me-2"></i>Publish to GitHub (Sync to All Devices)</h5>
+            <span class="badge bg-primary">Cloud Sync</span>
+          </div>
+          <p class="text-muted small">
+            <strong>How Multi-Device Access Works:</strong> GitHub Pages serves static files directly from your GitHub repository. Edits saved in this browser are stored locally so you can play immediately on this PC. To access your questions and settings from <strong>another PC, phone, or projector</strong>, publish the updated data to your GitHub repository below.
+          </p>
+
+          <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-5">
+              <label for="github-sync-repo" class="form-label small fw-bold">GitHub Repository (owner/repo)</label>
+              <input type="text" class="form-control form-control-sm" id="github-sync-repo" value="cgsocadiz/-trivia-jeopardy">
+            </div>
+            <div class="col-12 col-md-5">
+              <label for="github-sync-token" class="form-label small fw-bold">GitHub Personal Access Token (PAT)</label>
+              <div class="input-group input-group-sm">
+                <input type="password" class="form-control" id="github-sync-token" placeholder="ghp_... (Saved only in this browser)">
+                <button class="btn btn-outline-secondary" type="button" id="btn-toggle-github-token"><i class="bi bi-eye"></i></button>
+              </div>
+            </div>
+            <div class="col-12 col-md-2">
+              <button class="btn btn-primary btn-sm w-100 fw-bold py-2" id="btn-sync-github">
+                <span class="spinner-border spinner-border-sm me-1 d-none" id="sync-github-spinner"></span>
+                <i class="bi bi-cloud-check-fill me-1"></i> Sync to GitHub
+              </button>
+            </div>
+          </div>
+          <div class="small text-muted mt-2">
+            <i class="bi bi-shield-lock me-1"></i> Your token is kept strictly in this browser's localStorage and only communicates directly with <code>api.github.com</code>.
+          </div>
+        </div>
+
         <div class="row g-3">
           <!-- Export Card -->
           <div class="col-12 col-md-6">
@@ -329,13 +368,13 @@
 
               <!-- Static GitHub Pages Deployment Notice -->
               <div class="alert alert-info mt-4 mb-0 small">
-                <h6 class="alert-heading fw-bold"><i class="bi bi-info-circle-fill me-1"></i>How Static GitHub Pages Publishing Works:</h6>
-                GitHub Pages is a static host. Edits made in this admin panel reside in your browser memory until exported.
+                <h6 class="alert-heading fw-bold"><i class="bi bi-info-circle-fill me-1"></i>Manual Git Push Workflow:</h6>
+                If you prefer using Git on your computer instead of a browser token:
                 <ol class="mb-0 ps-3 mt-2">
                   <li>Click <strong>Export questions.json</strong>.</li>
-                  <li>Replace the file at <code>assets/data/questions.json</code> in your local project.</li>
-                  <li>Commit and push the change to your GitHub repository (<code>git commit -am "Update questions" && git push</code>).</li>
-                  <li>GitHub Pages will automatically serve the updated trivia set to all visitors!</li>
+                  <li>Copy the downloaded file into <code>assets/data/questions.json</code> in this project folder.</li>
+                  <li>Run: <code>git commit -am "Update questions" && git push</code></li>
+                  <li>GitHub Pages will automatically update for all computers within ~30 seconds!</li>
                 </ol>
               </div>
             </div>
