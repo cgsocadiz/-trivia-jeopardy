@@ -701,12 +701,6 @@ const AdminApp = (function () {
         </td>
         <td class="text-end text-nowrap">
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-outline-secondary btn-move-clue-up py-1 px-2" title="Move Up" ${origIdx === 0 ? 'disabled' : ''}>
-              <i class="bi bi-chevron-up"></i>
-            </button>
-            <button class="btn btn-outline-secondary btn-move-clue-down py-1 px-2" title="Move Down" ${origIdx === currentCat.clues.length - 1 ? 'disabled' : ''}>
-              <i class="bi bi-chevron-down"></i>
-            </button>
             <button class="btn btn-outline-primary btn-edit-clue py-1 px-2" title="Edit Clue">
               <i class="bi bi-pencil-fill"></i>
             </button>
@@ -720,8 +714,6 @@ const AdminApp = (function () {
         </td>
       `;
 
-      tr.querySelector('.btn-move-clue-up').addEventListener('click', () => moveClue(origIdx, -1));
-      tr.querySelector('.btn-move-clue-down').addEventListener('click', () => moveClue(origIdx, 1));
       tr.querySelector('.btn-edit-clue').addEventListener('click', () => openClueModal(clue));
       tr.querySelector('.btn-duplicate-clue').addEventListener('click', () => duplicateClue(clue));
       tr.querySelector('.btn-delete-clue').addEventListener('click', () => promptDeleteClue(clue.id));
