@@ -17,6 +17,7 @@ const AdminApp = (function () {
   // Pre-configured default GitHub sync repository and token (encoded)
   const DEFAULT_GITHUB_REPO = 'cgsocadiz/-trivia-jeopardy';
   const DEFAULT_ENCODED_TOKEN = 'Z2l0aHViX3BhdF8xMUNPVTRTQUEwSVl1MjVWVXVLdWhtX1pvaDdLWTVON1dHU3VVd0hodFhHQkdLREt4T1RxS0R1R3hkdXNwUk9IZlNXRFFPWEpaM3o3R0N4MExadg==';
+  const GITHUB_TOKEN_VERSION = '2026_pat_v2';
 
   // Cache DOM elements
   const els = {};
@@ -86,6 +87,7 @@ const AdminApp = (function () {
     els.githubSyncToken = document.getElementById('github-sync-token');
     els.githubSyncRepo = document.getElementById('github-sync-repo');
     els.btnToggleGithubToken = document.getElementById('btn-toggle-github-token');
+    els.btnResetGithubToken = document.getElementById('btn-reset-github-token');
 
     // Password change modal
     els.changePasswordForm = document.getElementById('change-password-form');
@@ -258,12 +260,32 @@ const AdminApp = (function () {
       });
     }
 
-    // Load saved GitHub token & repo from localStorage, or prefill with built-in default
+    if (els.btnResetGithubToken && els.githubSyncToken) {
+      els.btnResetGithubToken.addEventListener('click', () => {
+        const defToken = DEFAULT_ENCODED_TOKEN ? atob(DEFAULT_ENCODED_TOKEN).trim() : '';
+        els.githubSyncToken.value = defToken;
+        try {
+          localStorage.setItem('trivia_github_sync_token', defToken);
+          localStorage.setItem('trivia_github_token_version', GITHUB_TOKEN_VERSION);
+        } catch (e) {}
+        showAppModal('Token Reset', 'GitHub Personal Access Token has been restored to the default working token.', 'info');
+      });
+    }
+
+    // Load saved GitHub token & repo from localStorage, or prefill with built-in default.
+    // Automatically purge legacy/invalid tokens cached from older manual testing sessions.
     try {
+      const storedVersion = localStorage.getItem('trivia_github_token_version');
+      if (storedVersion !== GITHUB_TOKEN_VERSION) {
+        localStorage.removeItem('trivia_github_sync_token');
+        localStorage.setItem('trivia_github_token_version', GITHUB_TOKEN_VERSION);
+      }
+
+      const defaultToken = DEFAULT_ENCODED_TOKEN ? atob(DEFAULT_ENCODED_TOKEN).trim() : '';
       const savedToken = localStorage.getItem('trivia_github_sync_token');
       const savedRepo = localStorage.getItem('trivia_github_sync_repo');
       const initialRepo = savedRepo || DEFAULT_GITHUB_REPO;
-      const initialToken = savedToken || (DEFAULT_ENCODED_TOKEN ? atob(DEFAULT_ENCODED_TOKEN) : '');
+      const initialToken = savedToken || defaultToken;
 
       if (els.githubSyncRepo && initialRepo) els.githubSyncRepo.value = initialRepo;
       if (els.githubSyncToken && initialToken) els.githubSyncToken.value = initialToken;
@@ -855,9 +877,10 @@ const AdminApp = (function () {
     const spinner = document.getElementById('sync-github-spinner');
     const syncBtn = document.getElementById('btn-sync-github');
 
+    const defaultToken = DEFAULT_ENCODED_TOKEN ? atob(DEFAULT_ENCODED_TOKEN).trim() : '';
     let token = (tokenInput ? tokenInput.value : '').trim();
-    if (!token && DEFAULT_ENCODED_TOKEN) {
-      try { token = atob(DEFAULT_ENCODED_TOKEN).trim(); } catch (e) {}
+    if (!token && defaultToken) {
+      token = defaultToken;
     }
 
     const repo = (repoInput && repoInput.value.trim()) ? repoInput.value.trim() : DEFAULT_GITHUB_REPO;
@@ -880,21 +903,16 @@ const AdminApp = (function () {
       return;
     }
 
-    try {
-      localStorage.setItem('trivia_github_sync_token', token);
-      localStorage.setItem('trivia_github_sync_repo', repo);
-    } catch (e) {}
-
     if (syncBtn) syncBtn.disabled = true;
     if (spinner) spinner.classList.remove('d-none');
     if (els.btnTopbarPublish) els.btnTopbarPublish.disabled = true;
     if (els.topbarPublishSpinner) els.topbarPublishSpinner.classList.remove('d-none');
 
-    // Use appropriate auth prefix for GitHub
-    const authHeader = token.startsWith('github_pat_') ? `Bearer ${token}` : `token ${token}`;
-
-    try {
+    // Helper function that attempts the sync using a specific token
+    const executeSyncRequest = async (activeToken) => {
+      const authHeader = activeToken.startsWith('github_pat_') ? `Bearer ${activeToken}` : `token ${activeToken}`;
       const fileUrl = `https://api.github.com/repos/${repo}/contents/assets/data/questions.json`;
+
       const getResp = await fetch(fileUrl, {
         headers: {
           'Authorization': authHeader,
@@ -907,9 +925,14 @@ const AdminApp = (function () {
         const fileInfo = await getResp.json();
         currentSha = fileInfo.sha;
       } else if (getResp.status === 401) {
-        throw new Error('Bad credentials: GitHub did not recognize this token. Please make sure you are entering a Personal Access Token (starts with ghp_ or github_pat_) and not your account password.');
+        const err = new Error('Bad credentials: GitHub did not recognize this token.');
+        err.statusCode = 401;
+        throw err;
       } else if (getResp.status === 404) {
         throw new Error(`Repository "${repo}" or file "assets/data/questions.json" not found. Please verify the repository name.`);
+      } else {
+        const errJson = await getResp.json().catch(() => ({}));
+        throw new Error(errJson.message || `GitHub API error (${getResp.status}): ${getResp.statusText}`);
       }
 
       const jsonString = JSON.stringify(editorData, null, 2);
@@ -940,11 +963,42 @@ const AdminApp = (function () {
       if (!putResp.ok) {
         const errJson = await putResp.json().catch(() => ({}));
         if (putResp.status === 401) {
-          throw new Error('Bad credentials: Your token is invalid or expired.');
+          const err = new Error('Bad credentials: Your token is invalid or expired.');
+          err.statusCode = 401;
+          throw err;
         } else if (putResp.status === 403) {
-          throw new Error('403 Forbidden: Your token does not have write access to this repository. Please make sure the "repo" scope or "Contents: Read and write" permission is checked.');
+          const err = new Error('403 Forbidden: Your token does not have write access to this repository.');
+          err.statusCode = 403;
+          throw err;
         }
         throw new Error(errJson.message || `HTTP ${putResp.status} ${putResp.statusText}`);
+      }
+
+      return true;
+    };
+
+    try {
+      try {
+        await executeSyncRequest(token);
+        try {
+          localStorage.setItem('trivia_github_sync_token', token);
+          localStorage.setItem('trivia_github_sync_repo', repo);
+        } catch (e) {}
+      } catch (firstErr) {
+        // If the token failed with 401 or 403 (e.g. stale token cached in Chrome) and we have a working default, auto-heal!
+        if ((firstErr.statusCode === 401 || firstErr.statusCode === 403) && defaultToken && token !== defaultToken) {
+          console.warn('Cached browser token rejected with auth error. Retrying with default token...');
+          await executeSyncRequest(defaultToken);
+          token = defaultToken;
+          if (tokenInput) tokenInput.value = defaultToken;
+          try {
+            localStorage.setItem('trivia_github_sync_token', defaultToken);
+            localStorage.setItem('trivia_github_sync_repo', repo);
+            localStorage.setItem('trivia_github_token_version', GITHUB_TOKEN_VERSION);
+          } catch (e) {}
+        } else {
+          throw firstErr;
+        }
       }
 
       rawSourceData = JSON.parse(JSON.stringify(editorData));
@@ -961,7 +1015,7 @@ const AdminApp = (function () {
     } catch (err) {
       showAppModal(
         'Sync Failed',
-        `${err.message}\n\nYou can click the "Generate Token" link above to generate a new token with the "repo" scope pre-selected.`,
+        `${err.message}\n\nPlease click the reset button next to the token input to restore the default working token, or generate a new token with the "repo" scope.`,
         'danger'
       );
     } finally {
