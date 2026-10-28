@@ -849,8 +849,12 @@ const AdminApp = (function () {
     const spinner = document.getElementById('sync-github-spinner');
     const syncBtn = document.getElementById('btn-sync-github');
 
-    const token = (tokenInput ? tokenInput.value : '').trim();
+    let token = (tokenInput ? tokenInput.value : '').trim();
     const repo = (repoInput ? repoInput.value : '').trim();
+
+    // Sanitize any accidental prefixes
+    if (token.startsWith('Bearer ')) token = token.substring(7).trim();
+    if (token.startsWith('token ')) token = token.substring(6).trim();
 
     if (!repo || !repo.includes('/')) {
       showAppModal('Invalid Repository', 'Please enter a valid repository in the format "owner/repo" (e.g. cgsocadiz/-trivia-jeopardy).', 'warning');
@@ -860,7 +864,7 @@ const AdminApp = (function () {
     if (!token) {
       showAppModal(
         'GitHub Token Required',
-        'To push updates directly from your browser to GitHub, please enter a GitHub Personal Access Token (PAT) with "Contents: Read and write" permission.\n\nAlternatively, you can click "Export questions.json" below, copy it into assets/data/questions.json, and run "git commit && git push" from your terminal.',
+        'To push updates directly from your browser to GitHub, please enter a GitHub Personal Access Token (PAT) with "Contents: Read and write" permission.\n\nClick the "Generate Token" link above to create one with the correct permissions in one click.\n\nAlternatively, you can click "Export questions.json" below and commit it via Git CLI.',
         'info'
       );
       return;
@@ -874,11 +878,14 @@ const AdminApp = (function () {
     syncBtn.disabled = true;
     if (spinner) spinner.classList.remove('d-none');
 
+    // Use appropriate auth prefix for GitHub
+    const authHeader = token.startsWith('github_pat_') ? `Bearer ${token}` : `token ${token}`;
+
     try {
       const fileUrl = `https://api.github.com/repos/${repo}/contents/assets/data/questions.json`;
       const getResp = await fetch(fileUrl, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': authHeader,
           'Accept': 'application/vnd.github.v3+json'
         }
       });
@@ -887,6 +894,10 @@ const AdminApp = (function () {
       if (getResp.ok) {
         const fileInfo = await getResp.json();
         currentSha = fileInfo.sha;
+      } else if (getResp.status === 401) {
+        throw new Error('Bad credentials: GitHub did not recognize this token. Please make sure you are entering a Personal Access Token (starts with ghp_ or github_pat_) and not your account password.');
+      } else if (getResp.status === 404) {
+        throw new Error(`Repository "${repo}" or file "assets/data/questions.json" not found. Please verify the repository name.`);
       }
 
       const jsonString = JSON.stringify(editorData, null, 2);
@@ -907,7 +918,7 @@ const AdminApp = (function () {
       const putResp = await fetch(fileUrl, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': authHeader,
           'Accept': 'application/vnd.github.v3+json',
           'Content-Type': 'application/json'
         },
@@ -916,6 +927,11 @@ const AdminApp = (function () {
 
       if (!putResp.ok) {
         const errJson = await putResp.json().catch(() => ({}));
+        if (putResp.status === 401) {
+          throw new Error('Bad credentials: Your token is invalid or expired.');
+        } else if (putResp.status === 403) {
+          throw new Error('403 Forbidden: Your token does not have write access to this repository. Please make sure the "repo" scope or "Contents: Read and write" permission is checked.');
+        }
         throw new Error(errJson.message || `HTTP ${putResp.status} ${putResp.statusText}`);
       }
 
@@ -927,7 +943,7 @@ const AdminApp = (function () {
     } catch (err) {
       showAppModal(
         'Sync Failed',
-        `Could not update GitHub repository: ${err.message}\n\nPlease check that your Personal Access Token has "Contents: Read and write" permissions for repository ${repo}.\n\nYou can also download the file via "Export questions.json" and push via Git CLI.`,
+        `${err.message}\n\nYou can click the "Generate Token" link above to generate a new token with the "repo" scope pre-selected.`,
         'danger'
       );
     } finally {
