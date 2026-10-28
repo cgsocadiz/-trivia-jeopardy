@@ -14,6 +14,8 @@ const GameState = (function () {
     currentRoundIndex: 0,
     currentClue: null,
     usedClueIds: [],
+    activeRoundBoards: {}, // Sampled categories with 5 clues each per round index
+    selectedCategoryIds: null, // Optional list of chosen category IDs for custom round selection
     teams: [
       { id: 'team-1', name: 'Team Alpha', score: 0, color: '#0d6efd' },
       { id: 'team-2', name: 'Team Bravo', score: 0, color: '#dc3545' }
@@ -140,12 +142,129 @@ const GameState = (function () {
   }
 
   /**
-   * Helper to get current round object
+   * Samples 1 random clue per difficulty level (1 to 5) for categories with question pools
+   * @param {object} rawRound
+   * @returns {Array} Array of category objects with exactly 5 clues each
+   */
+  function sampleRoundCategories(rawRound) {
+    if (!rawRound || !rawRound.categories) return [];
+    const multiplier = rawRound.multiplier || 1;
+
+    return rawRound.categories.map(cat => {
+      const allClues = cat.clues || [];
+      if (allClues.length <= 5) {
+        return {
+          id: cat.id,
+          name: cat.name,
+          clues: JSON.parse(JSON.stringify(allClues))
+        };
+      }
+
+      // Category has a question pool (e.g. 100 questions, 20 per tier)
+      const sampledClues = [];
+      for (let d = 1; d <= 5; d++) {
+        let tierClues = allClues.filter(c => c.difficulty === d);
+        if (tierClues.length === 0) {
+          const expectedPoints = d * 100 * multiplier;
+          tierClues = allClues.filter(c => c.points === expectedPoints);
+        }
+        if (tierClues.length === 0) {
+          tierClues = allClues;
+        }
+
+        const picked = tierClues[Math.floor(Math.random() * tierClues.length)];
+        if (picked) {
+          const clueCopy = JSON.parse(JSON.stringify(picked));
+          // Ensure points match round multiplier
+          clueCopy.points = d * 100 * multiplier;
+          sampledClues.push(clueCopy);
+        }
+      }
+
+      // Sort by points ascending
+      sampledClues.sort((a, b) => a.points - b.points);
+
+      return {
+        id: cat.id,
+        name: cat.name,
+        clues: sampledClues
+      };
+    });
+  }
+
+  /**
+   * Randomly assign Daily Doubles if none are active in the sampled board
+   */
+  function assignDailyDoubles(categories, count = 1) {
+    const flatClues = [];
+    categories.forEach(c => {
+      if (c.clues) c.clues.forEach(cl => flatClues.push(cl));
+    });
+    if (flatClues.length === 0) return;
+
+    const existingDD = flatClues.filter(c => c.dailyDouble);
+    if (existingDD.length >= count) return;
+
+    // Prefer tier 2-5 clues for Daily Double
+    const candidates = flatClues.filter(c => (c.difficulty || 1) > 1 && !c.dailyDouble);
+    const pool = candidates.length >= count ? candidates : flatClues;
+    const needed = count - existingDD.length;
+    const shuffled = [...pool].sort(() => Math.random() - 0.5);
+    for (let i = 0; i < needed && i < shuffled.length; i++) {
+      shuffled[i].dailyDouble = true;
+    }
+  }
+
+  /**
+   * Gets active sampled categories for a round index
+   */
+  function getActiveRoundCategories(roundIndex = state.currentRoundIndex, forceResample = false) {
+    if (!state.activeRoundBoards) {
+      state.activeRoundBoards = {};
+    }
+
+    if (!forceResample && state.activeRoundBoards[roundIndex] && state.activeRoundBoards[roundIndex].length > 0) {
+      if (Array.isArray(state.selectedCategoryIds) && state.selectedCategoryIds.length > 0) {
+        return state.activeRoundBoards[roundIndex].filter(c => state.selectedCategoryIds.includes(c.id));
+      }
+      return state.activeRoundBoards[roundIndex];
+    }
+
+    const rawRound = getRawCurrentRound(roundIndex);
+    if (!rawRound) return [];
+
+    const sampled = sampleRoundCategories(rawRound);
+    const ddCount = (rawRound.multiplier && rawRound.multiplier > 1) ? 2 : 1;
+    assignDailyDoubles(sampled, ddCount);
+
+    state.activeRoundBoards[roundIndex] = sampled;
+
+    if (Array.isArray(state.selectedCategoryIds) && state.selectedCategoryIds.length > 0) {
+      return sampled.filter(c => state.selectedCategoryIds.includes(c.id));
+    }
+    return sampled;
+  }
+
+  function resampleRoundBoard(roundIndex = state.currentRoundIndex) {
+    return getActiveRoundCategories(roundIndex, true);
+  }
+
+  function getRawCurrentRound(roundIndex = state.currentRoundIndex) {
+    if (!state.gameData || !state.gameData.game || !state.gameData.game.rounds) return null;
+    return state.gameData.game.rounds[roundIndex] || null;
+  }
+
+  /**
+   * Helper to get current round object with active sampled categories
    * @returns {object|null}
    */
   function getCurrentRound() {
-    if (!state.gameData || !state.gameData.game || !state.gameData.game.rounds) return null;
-    return state.gameData.game.rounds[state.currentRoundIndex] || null;
+    const rawRound = getRawCurrentRound(state.currentRoundIndex);
+    if (!rawRound) return null;
+    return {
+      ...rawRound,
+      categories: getActiveRoundCategories(state.currentRoundIndex)
+    };
   }
 
   /**
@@ -214,6 +333,10 @@ const GameState = (function () {
     setGameData,
     getActiveTeam,
     getCurrentRound,
+    getRawCurrentRound,
+    getActiveRoundCategories,
+    resampleRoundBoard,
+    sampleRoundCategories,
     isClueCompleted,
     markClueCompleted,
     isRoundCompleted,

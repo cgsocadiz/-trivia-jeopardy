@@ -12,6 +12,9 @@ const AdminApp = (function () {
   let editorData = null;
   let currentRoundIdx = 0;
   let currentCategoryIdx = 0;
+  let currentTierFilter = 'all'; // 'all', '1', '2', '3', '4', '5'
+  let clueSearchQuery = '';
+  let previewSampledState = {};
   let editingClueId = null;
 
   // Pre-configured default GitHub sync repository and token (encoded)
@@ -195,6 +198,39 @@ const AdminApp = (function () {
     const addRoundBtn = document.getElementById('btn-add-round');
     if (addRoundBtn) {
       addRoundBtn.addEventListener('click', handleAddRound);
+    }
+
+    // Category Library button
+    const catLibBtn = document.getElementById('btn-category-library');
+    if (catLibBtn) {
+      catLibBtn.addEventListener('click', openCategoryLibraryModal);
+    }
+
+    // Preview Randomize button
+    const randomizeBtn = document.getElementById('btn-preview-randomize');
+    if (randomizeBtn) {
+      randomizeBtn.addEventListener('click', () => {
+        renderPreviewBoard(true);
+      });
+    }
+
+    // Clue tier filter buttons
+    document.querySelectorAll('.btn-tier-filter').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.btn-tier-filter').forEach(b => b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        currentTierFilter = e.currentTarget.dataset.tier || 'all';
+        renderClues();
+      });
+    });
+
+    // Clue search filter input
+    const cluesSearch = document.getElementById('admin-clues-search');
+    if (cluesSearch) {
+      cluesSearch.addEventListener('input', (e) => {
+        clueSearchQuery = e.target.value.toLowerCase().trim();
+        renderClues();
+      });
     }
 
     // Add category button
@@ -589,7 +625,7 @@ const AdminApp = (function () {
     });
   }
 
-  function renderClues() {
+    function renderClues() {
     const selectedHeader = document.getElementById('selected-category-header-title');
     if (!els.cluesTableBody || !editorData || !editorData.game) return;
     const rounds = editorData.game.rounds || [];
@@ -607,20 +643,53 @@ const AdminApp = (function () {
       return;
     }
 
-    if (selectedHeader) {
-      selectedHeader.textContent = `${currentCat.name} (${currentCat.clues ? currentCat.clues.length : 0} clues)`;
+    const allClues = currentCat.clues || [];
+    const multiplier = currentRound.multiplier || 1;
+
+    // Update tier pill counts
+    const countAllEl = document.getElementById('count-tier-all');
+    if (countAllEl) countAllEl.textContent = allClues.length;
+    for (let d = 1; d <= 5; d++) {
+      const countEl = document.getElementById(`count-tier-${d}`);
+      if (countEl) {
+        const cnt = allClues.filter(c => (c.difficulty === d) || (!c.difficulty && Math.round(c.points / (100 * multiplier)) === d)).length;
+        countEl.textContent = cnt;
+      }
     }
 
-    if (!currentCat.clues || currentCat.clues.length === 0) {
+    if (selectedHeader) {
+      selectedHeader.textContent = `${currentCat.name} (${allClues.length} clues in pool)`;
+    }
+
+    if (allClues.length === 0) {
       els.cluesTableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No clues in this category yet. Click "+ Add Clue" above to add one.</td></tr>';
       return;
     }
 
+    // Filter by tier and search query
+    let filteredClues = allClues;
+    if (currentTierFilter !== 'all') {
+      const targetTier = parseInt(currentTierFilter, 10);
+      filteredClues = filteredClues.filter(c => (c.difficulty === targetTier) || (!c.difficulty && Math.round(c.points / (100 * multiplier)) === targetTier));
+    }
+    if (clueSearchQuery) {
+      filteredClues = filteredClues.filter(c => 
+        (c.clue && c.clue.toLowerCase().includes(clueSearchQuery)) ||
+        (c.answer && c.answer.toLowerCase().includes(clueSearchQuery))
+      );
+    }
+
+    if (filteredClues.length === 0) {
+      els.cluesTableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No clues match the selected tier or search term.</td></tr>';
+      return;
+    }
+
     els.cluesTableBody.innerHTML = '';
-    currentCat.clues.forEach((clue, idx) => {
+    filteredClues.forEach((clue) => {
+      const origIdx = currentCat.clues.findIndex(c => c.id === clue.id);
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td class="fw-bold text-warning text-nowrap">$${clue.points}</td>
+        <td class="fw-bold text-warning text-nowrap">$ ${clue.points}</td>
         <td>
           <div class="clue-preview-text" title="${escapeHtml(clue.clue)}">${escapeHtml(clue.clue)}</div>
         </td>
@@ -632,10 +701,10 @@ const AdminApp = (function () {
         </td>
         <td class="text-end text-nowrap">
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-outline-secondary btn-move-clue-up py-1 px-2" title="Move Up" ${idx === 0 ? 'disabled' : ''}>
+            <button class="btn btn-outline-secondary btn-move-clue-up py-1 px-2" title="Move Up" ${origIdx === 0 ? 'disabled' : ''}>
               <i class="bi bi-chevron-up"></i>
             </button>
-            <button class="btn btn-outline-secondary btn-move-clue-down py-1 px-2" title="Move Down" ${idx === currentCat.clues.length - 1 ? 'disabled' : ''}>
+            <button class="btn btn-outline-secondary btn-move-clue-down py-1 px-2" title="Move Down" ${origIdx === currentCat.clues.length - 1 ? 'disabled' : ''}>
               <i class="bi bi-chevron-down"></i>
             </button>
             <button class="btn btn-outline-primary btn-edit-clue py-1 px-2" title="Edit Clue">
@@ -651,8 +720,8 @@ const AdminApp = (function () {
         </td>
       `;
 
-      tr.querySelector('.btn-move-clue-up').addEventListener('click', () => moveClue(idx, -1));
-      tr.querySelector('.btn-move-clue-down').addEventListener('click', () => moveClue(idx, 1));
+      tr.querySelector('.btn-move-clue-up').addEventListener('click', () => moveClue(origIdx, -1));
+      tr.querySelector('.btn-move-clue-down').addEventListener('click', () => moveClue(origIdx, 1));
       tr.querySelector('.btn-edit-clue').addEventListener('click', () => openClueModal(clue));
       tr.querySelector('.btn-duplicate-clue').addEventListener('click', () => duplicateClue(clue));
       tr.querySelector('.btn-delete-clue').addEventListener('click', () => promptDeleteClue(clue.id));
@@ -662,6 +731,92 @@ const AdminApp = (function () {
   }
 
   // --- Round Actions ---
+  
+  // --- Category Library Modal Logic ---
+  function openCategoryLibraryModal() {
+    const listContainer = document.getElementById('category-library-list');
+    if (!listContainer) return;
+    listContainer.innerHTML = '';
+
+    const currentRound = (editorData && editorData.game && editorData.game.rounds) ? editorData.game.rounds[currentRoundIdx] : null;
+    const currentCatIds = (currentRound && currentRound.categories) ? currentRound.categories.map(c => c.id) : [];
+
+    // Gather library from DEFAULT_SAMPLE_QUESTIONS
+    const sampleRounds = (window.DEFAULT_SAMPLE_QUESTIONS && window.DEFAULT_SAMPLE_QUESTIONS.game && window.DEFAULT_SAMPLE_QUESTIONS.game.rounds) ? window.DEFAULT_SAMPLE_QUESTIONS.game.rounds : [];
+    const libraryCats = [];
+    sampleRounds.forEach(r => {
+      (r.categories || []).forEach(cat => {
+        if (!libraryCats.some(c => c.id === cat.id)) {
+          libraryCats.push(cat);
+        }
+      });
+    });
+
+    if (libraryCats.length === 0) {
+      listContainer.innerHTML = '<div class="alert alert-secondary text-center">No categories found in library.</div>';
+      const modal = new bootstrap.Modal(document.getElementById('categoryLibraryModal'));
+      modal.show();
+      return;
+    }
+
+    libraryCats.forEach(cat => {
+      const isInCurrent = currentCatIds.includes(cat.id);
+      const item = document.createElement('div');
+      item.className = 'list-group-item d-flex justify-content-between align-items-center p-3 mb-2 rounded border';
+      item.innerHTML = `
+        <div>
+          <div class="fw-bold">${escapeHtml(cat.name)}</div>
+          <small class="text-muted">${cat.clues ? cat.clues.length : 0} curated questions (20 per difficulty tier: 1 to 5)</small>
+        </div>
+        <div>
+          ${isInCurrent 
+            ? '<span class="badge bg-secondary"><i class="bi bi-check2 me-1"></i>In Current Round</span>' 
+            : `<button class="btn btn-sm btn-primary fw-bold btn-add-lib-cat" data-cat-id="${cat.id}"><i class="bi bi-plus-circle me-1"></i> Add to Round</button>`
+          }
+        </div>
+      `;
+
+      const btn = item.querySelector('.btn-add-lib-cat');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          addCategoryFromLibrary(cat);
+          const modalEl = document.getElementById('categoryLibraryModal');
+          const modal = bootstrap.Modal.getInstance(modalEl);
+          if (modal) modal.hide();
+        });
+      }
+
+      listContainer.appendChild(item);
+    });
+
+    const modal = new bootstrap.Modal(document.getElementById('categoryLibraryModal'));
+    modal.show();
+  }
+
+  function addCategoryFromLibrary(cat) {
+    if (!editorData || !editorData.game || !editorData.game.rounds) return;
+    const currentRound = editorData.game.rounds[currentRoundIdx];
+    if (!currentRound) return;
+
+    if (!currentRound.categories) currentRound.categories = [];
+    const multiplier = currentRound.multiplier || 1;
+
+    // Clone category and adjust points to round multiplier
+    const newCat = JSON.parse(JSON.stringify(cat));
+    newCat.clues.forEach(clue => {
+      clue.points = (clue.difficulty || 1) * 100 * multiplier;
+    });
+
+    currentRound.categories.push(newCat);
+    currentCategoryIdx = currentRound.categories.length - 1;
+
+    renderRounds();
+    renderCategories();
+    renderClues();
+    triggerAutoSave();
+    showDialogModal('Category Added', `"${newCat.name}" with ${newCat.clues.length} questions has been added to ${currentRound.title}.`);
+  }
+
   function handleAddRound() {
     showPromptModal('Create New Round', 'Enter a name for the new round (e.g. "Triple Jeopardy"):', (newRoundTitle) => {
       if (!newRoundTitle) return;
@@ -1191,7 +1346,26 @@ const AdminApp = (function () {
   }
 
   // --- Preview Board ---
-  function renderPreviewBoard() {
+    // --- Preview Board ---
+  function sampleCategoryForPreview(cat, multiplier) {
+    const allClues = cat.clues || [];
+    if (allClues.length <= 5) return allClues;
+
+    const sampled = [];
+    for (let d = 1; d <= 5; d++) {
+      let pool = allClues.filter(c => c.difficulty === d);
+      if (pool.length === 0) {
+        pool = allClues.filter(c => c.points === d * 100 * multiplier);
+      }
+      if (pool.length === 0) pool = allClues;
+      const picked = pool[Math.floor(Math.random() * pool.length)];
+      if (picked) sampled.push(picked);
+    }
+    sampled.sort((a, b) => a.points - b.points);
+    return sampled;
+  }
+
+  function renderPreviewBoard(forceResample = false) {
     if (!els.previewBoardContainer || !editorData || !editorData.game) return;
     const rounds = editorData.game.rounds || [];
     const round = rounds[currentRoundIdx];
@@ -1201,7 +1375,16 @@ const AdminApp = (function () {
       return;
     }
 
-    const categories = round.categories;
+    const multiplier = round.multiplier || 1;
+    if (forceResample || !previewSampledState[currentRoundIdx]) {
+      previewSampledState[currentRoundIdx] = round.categories.map(cat => ({
+        id: cat.id,
+        name: cat.name,
+        clues: sampleCategoryForPreview(cat, multiplier)
+      }));
+    }
+
+    const categories = previewSampledState[currentRoundIdx];
     const maxClues = Math.max(1, ...categories.map(c => (c.clues ? c.clues.length : 0)));
 
     let html = `<div class="preview-board-wrapper"><div class="trivia-board-table" style="--board-columns: ${categories.length}">`;

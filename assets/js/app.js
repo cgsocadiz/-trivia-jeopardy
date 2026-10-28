@@ -231,6 +231,7 @@ const App = (function () {
     if (teamCountSelect) {
       teamCountSelect.value = '2';
       renderTeamInputs(2);
+    renderSetupCategories();
     }
 
     switchView(VIEWS.SETUP);
@@ -260,10 +261,57 @@ const App = (function () {
       });
     }
 
+    const selectAllCatsBtn = document.getElementById('btn-setup-cats-all');
+    if (selectAllCatsBtn) {
+      selectAllCatsBtn.addEventListener('click', () => {
+        document.querySelectorAll('.setup-category-check').forEach(cb => cb.checked = true);
+      });
+    }
+
+    const defaultCatsBtn = document.getElementById('btn-setup-cats-default');
+    if (defaultCatsBtn) {
+      defaultCatsBtn.addEventListener('click', () => {
+        document.querySelectorAll('.setup-category-check').forEach((cb, idx) => {
+          cb.checked = idx < 5;
+        });
+      });
+    }
+
     const startGameBtn = document.getElementById('btn-setup-start');
     if (startGameBtn) {
       startGameBtn.addEventListener('click', handleStartGame);
     }
+  }
+
+  
+  function renderSetupCategories() {
+    const container = document.getElementById('setup-categories-list');
+    if (!container) return;
+
+    const rawRound = (typeof GameState.getRawCurrentRound === 'function') ? GameState.getRawCurrentRound(0) : GameState.getCurrentRound();
+    const categories = (rawRound && rawRound.categories) ? rawRound.categories : [];
+
+    container.innerHTML = '';
+    if (categories.length === 0) {
+      container.innerHTML = '<div class="col-12 text-muted small p-2">No categories available in Round 1.</div>';
+      return;
+    }
+
+    categories.forEach((cat, idx) => {
+      const col = document.createElement('div');
+      col.className = 'col-12 col-md-6 col-lg-4';
+      const isChecked = idx < 5; // Default first 5
+      col.innerHTML = `
+        <div class="card p-2 bg-dark border-secondary h-100 d-flex flex-row align-items-center gap-2">
+          <input class="form-check-input setup-category-check flex-shrink-0 mt-0" type="checkbox" value="${cat.id}" id="cat-check-${idx}" ${isChecked ? 'checked' : ''}>
+          <label class="form-check-label small flex-grow-1 text-truncate mb-0" for="cat-check-${idx}" style="cursor: pointer;">
+            <div class="fw-bold text-light text-truncate">${cat.name}</div>
+            <div class="text-muted" style="font-size: 0.75rem;">${cat.clues ? cat.clues.length : 0} clues (1 random per tier)</div>
+          </label>
+        </div>
+      `;
+      container.appendChild(col);
+    });
   }
 
   function renderTeamInputs(count) {
@@ -330,12 +378,18 @@ const App = (function () {
       soundEnabled: true
     };
 
+    const selectedCategoryIds = [];
+    document.querySelectorAll('.setup-category-check:checked').forEach(cb => {
+      selectedCategoryIds.push(cb.value);
+    });
+
     GameState.resetGame();
     GameState.setState({
       status: 'playing',
       currentRoundIndex: 0,
       teams: teams,
       activeTeamId: teams[0].id,
+      selectedCategoryIds: selectedCategoryIds.length > 0 ? selectedCategoryIds : null,
       settings: settings,
       startTime: Date.now(),
       scoreHistory: []

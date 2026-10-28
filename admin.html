@@ -144,6 +144,9 @@
             <select class="form-select d-none" id="admin-category-selector"></select>
 
             <div class="col-12 col-md-6 col-lg-7 text-md-end mt-2 mt-md-0 d-flex gap-2 justify-content-md-end">
+              <button class="btn btn-sm btn-outline-info fw-bold" id="btn-category-library" title="Add categories from 100-question library">
+                <i class="bi bi-collection-play me-1"></i> Category Library
+              </button>
               <button class="btn btn-sm btn-primary fw-bold" id="btn-add-category">
                 <i class="bi bi-folder-plus me-1"></i> Add Category
               </button>
@@ -174,6 +177,22 @@
                   <h6 class="mb-0 fw-bold"><i class="bi bi-card-text me-1 text-success"></i> Category Clues</h6>
                 </div>
                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle" id="selected-category-header-title">Select a category</span>
+              </div>
+
+              <!-- Difficulty Tier Filters & Search -->
+              <div class="p-2 px-3 border-bottom d-flex flex-wrap gap-2 align-items-center justify-content-between bg-body-tertiary">
+                <div class="btn-group btn-group-sm flex-wrap" role="group" id="admin-tier-filter-group">
+                  <button type="button" class="btn btn-outline-secondary active btn-tier-filter" data-tier="all">All (<span id="count-tier-all">100</span>)</button>
+                  <button type="button" class="btn btn-outline-secondary btn-tier-filter" data-tier="1">$100 (<span id="count-tier-1">20</span>)</button>
+                  <button type="button" class="btn btn-outline-secondary btn-tier-filter" data-tier="2">$200 (<span id="count-tier-2">20</span>)</button>
+                  <button type="button" class="btn btn-outline-secondary btn-tier-filter" data-tier="3">$300 (<span id="count-tier-3">20</span>)</button>
+                  <button type="button" class="btn btn-outline-secondary btn-tier-filter" data-tier="4">$400 (<span id="count-tier-4">20</span>)</button>
+                  <button type="button" class="btn btn-outline-secondary btn-tier-filter" data-tier="5">$500 (<span id="count-tier-5">20</span>)</button>
+                </div>
+                <div class="input-group input-group-sm" style="max-width: 220px;">
+                  <span class="input-group-text"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" id="admin-clues-search" placeholder="Search clues...">
+                </div>
               </div>
 
               <div class="table-responsive">
@@ -326,7 +345,10 @@
             </div>
             <div class="d-flex align-items-center gap-2">
               <label for="preview-round-selector" class="small fw-bold text-muted mb-0">Round:</label>
-              <select class="form-select form-select-sm" id="preview-round-selector" style="width: auto; min-width: 200px;"></select>
+              <select class="form-select form-select-sm" id="preview-round-selector" style="width: auto; min-width: 180px;"></select>
+              <button class="btn btn-outline-primary btn-sm fw-bold" id="btn-preview-randomize" title="Randomly draw a fresh set of questions from each category pool">
+                <i class="bi bi-dice-5-fill me-1"></i> Randomize Board Preview
+              </button>
             </div>
           </div>
           <div id="admin-preview-board"></div>
@@ -580,5 +602,27 @@
   <script src="assets/js/password-auth.js?v=6"></script>
   <script src="assets/js/persistence.js?v=6"></script>
   <script src="assets/js/admin.js?v=6"></script>
+
+  <!-- CATEGORY LIBRARY MODAL -->
+  <div class="modal fade" id="categoryLibraryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold"><i class="bi bi-collection-play text-info me-2"></i>Curated Category Library</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="small text-muted mb-3">
+            Each category includes <strong>100 curated questions</strong> (20 per difficulty tier). During gameplay, 1 random question per difficulty tier is drawn for the board.
+          </p>
+          <div class="list-group" id="category-library-list"></div>
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
