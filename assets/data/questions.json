@@ -305,21 +305,6 @@
             "id": "cat-mvrhtjrs",
             "name": "TEST1",
             "clues": []
-          },
-          {
-            "id": "cat-mvrhwwb0",
-            "name": "TEST2",
-            "clues": [
-              {
-                "id": "cat-mvrhwwb0-mvrhx5uq",
-                "points": 100,
-                "clue": "HEHE",
-                "answer": "tr",
-                "explanation": "",
-                "image": "",
-                "dailyDouble": false
-              }
-            ]
           }
         ]
       },
