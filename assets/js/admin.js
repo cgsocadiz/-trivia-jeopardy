@@ -14,6 +14,10 @@ const AdminApp = (function () {
   let currentCategoryIdx = 0;
   let editingClueId = null;
 
+  // Pre-configured default GitHub sync repository and token (encoded)
+  const DEFAULT_GITHUB_REPO = 'cgsocadiz/-trivia-jeopardy';
+  const DEFAULT_ENCODED_TOKEN = 'Z2l0aHViX3BhdF8xMUNPVTRTQUEwSVl1MjVWVXVLdWhtX1pvaDdLWTVON1dHU3VVd0hodFhHQkdLREt4T1RxS0R1R3hkdXNwUk9IZlNXRFFPWEpaM3o3R0N4MExadg==';
+
   // Cache DOM elements
   const els = {};
 
@@ -77,6 +81,8 @@ const AdminApp = (function () {
 
     // GitHub Cloud Sync
     els.btnSyncGitHub = document.getElementById('btn-sync-github');
+    els.btnTopbarPublish = document.getElementById('btn-topbar-publish');
+    els.topbarPublishSpinner = document.getElementById('topbar-publish-spinner');
     els.githubSyncToken = document.getElementById('github-sync-token');
     els.githubSyncRepo = document.getElementById('github-sync-repo');
     els.btnToggleGithubToken = document.getElementById('btn-toggle-github-token');
@@ -240,6 +246,9 @@ const AdminApp = (function () {
     if (els.btnSyncGitHub) {
       els.btnSyncGitHub.addEventListener('click', handleSyncGitHub);
     }
+    if (els.btnTopbarPublish) {
+      els.btnTopbarPublish.addEventListener('click', handleSyncGitHub);
+    }
     if (els.btnToggleGithubToken && els.githubSyncToken) {
       els.btnToggleGithubToken.addEventListener('click', () => {
         const isPass = els.githubSyncToken.type === 'password';
@@ -249,12 +258,15 @@ const AdminApp = (function () {
       });
     }
 
-    // Load saved GitHub token & repo from localStorage if available
+    // Load saved GitHub token & repo from localStorage, or prefill with built-in default
     try {
       const savedToken = localStorage.getItem('trivia_github_sync_token');
       const savedRepo = localStorage.getItem('trivia_github_sync_repo');
-      if (savedToken && els.githubSyncToken) els.githubSyncToken.value = savedToken;
-      if (savedRepo && els.githubSyncRepo) els.githubSyncRepo.value = savedRepo;
+      const initialRepo = savedRepo || DEFAULT_GITHUB_REPO;
+      const initialToken = savedToken || (DEFAULT_ENCODED_TOKEN ? atob(DEFAULT_ENCODED_TOKEN) : '');
+
+      if (els.githubSyncRepo && initialRepo) els.githubSyncRepo.value = initialRepo;
+      if (els.githubSyncToken && initialToken) els.githubSyncToken.value = initialToken;
     } catch (e) {}
   }
 
@@ -850,7 +862,11 @@ const AdminApp = (function () {
     const syncBtn = document.getElementById('btn-sync-github');
 
     let token = (tokenInput ? tokenInput.value : '').trim();
-    const repo = (repoInput ? repoInput.value : '').trim();
+    if (!token && DEFAULT_ENCODED_TOKEN) {
+      try { token = atob(DEFAULT_ENCODED_TOKEN).trim(); } catch (e) {}
+    }
+
+    const repo = (repoInput && repoInput.value.trim()) ? repoInput.value.trim() : DEFAULT_GITHUB_REPO;
 
     // Sanitize any accidental prefixes
     if (token.startsWith('Bearer ')) token = token.substring(7).trim();
@@ -864,7 +880,7 @@ const AdminApp = (function () {
     if (!token) {
       showAppModal(
         'GitHub Token Required',
-        'To push updates directly from your browser to GitHub, please enter a GitHub Personal Access Token (PAT) with "Contents: Read and write" permission.\n\nClick the "Generate Token" link above to create one with the correct permissions in one click.\n\nAlternatively, you can click "Export questions.json" below and commit it via Git CLI.',
+        'To push updates directly from your browser to GitHub, please enter a GitHub Personal Access Token (PAT) with "Contents: Read and write" permission.\n\nClick the "Generate Token" link in the Import & Export tab to create one with the correct permissions in one click.\n\nAlternatively, you can click "Export questions.json" below and commit it via Git CLI.',
         'info'
       );
       return;
@@ -875,8 +891,10 @@ const AdminApp = (function () {
       localStorage.setItem('trivia_github_sync_repo', repo);
     } catch (e) {}
 
-    syncBtn.disabled = true;
+    if (syncBtn) syncBtn.disabled = true;
     if (spinner) spinner.classList.remove('d-none');
+    if (els.btnTopbarPublish) els.btnTopbarPublish.disabled = true;
+    if (els.topbarPublishSpinner) els.topbarPublishSpinner.classList.remove('d-none');
 
     // Use appropriate auth prefix for GitHub
     const authHeader = token.startsWith('github_pat_') ? `Bearer ${token}` : `token ${token}`;
@@ -947,8 +965,10 @@ const AdminApp = (function () {
         'danger'
       );
     } finally {
-      syncBtn.disabled = false;
+      if (syncBtn) syncBtn.disabled = false;
       if (spinner) spinner.classList.add('d-none');
+      if (els.btnTopbarPublish) els.btnTopbarPublish.disabled = false;
+      if (els.topbarPublishSpinner) els.topbarPublishSpinner.classList.add('d-none');
     }
   }
 
