@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trivia Jeopardy - Interactive Game Show</title>
+  <meta name="description" content="A responsive, interactive Jeopardy-style trivia game with custom questions, team scoring, Daily Doubles, and Final Jeopardy. Ready for classroom, office, or party events.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+
+  <!-- Bootstrap 5 CSS via CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <!-- Bootstrap Icons via CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Custom Game Styles -->
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body class="theme-dark">
+
+  <!-- Top Navigation Bar -->
+  <header>
+    <nav class="navbar navbar-expand game-navbar px-3">
+      <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center gap-2 brand-title m-0" href="#" id="brand-link">
+          <i class="bi bi-grid-3x3-gap-fill text-warning"></i>
+          <span>Trivia Jeopardy</span>
+        </a>
+
+        <div class="d-flex align-items-center gap-2">
+          <!-- Fullscreen Toggle -->
+          <button class="btn btn-sm btn-outline-secondary" id="btn-fullscreen-toggle" title="Toggle Fullscreen (F)" aria-label="Toggle Fullscreen">
+            <i class="bi bi-arrows-fullscreen"></i>
+          </button>
+          <!-- Sound Toggle -->
+          <button class="btn btn-sm btn-outline-secondary" id="btn-sound-toggle" title="Toggle Sound (M)" aria-label="Toggle Sound">
+            <i class="bi bi-volume-up-fill"></i>
+          </button>
+          <!-- Theme Toggle (Light / Dark) -->
+          <button class="btn btn-sm btn-outline-secondary" id="theme-toggle-btn" title="Toggle Theme" aria-label="Toggle Light or Dark Mode">
+            <i class="bi bi-sun-fill"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <!-- VIEW 1: HOME SCREEN -->
+    <section id="view-home" class="hero-section text-center">
+      <div class="container py-4">
+        <span class="badge bg-primary text-light hero-badge mb-3">Host-Controlled Trivia Game Show</span>
+        <h1 class="hero-title mb-3">TRIVIA JEOPARDY</h1>
+        <p class="hero-subtitle mb-4">Pick a category. Choose your points. Prove your knowledge.</p>
+
+        <div class="hero-actions d-flex flex-wrap justify-content-center gap-3 mb-4">
+          <button class="btn btn-warning btn-lg px-4 py-2 fw-bold text-dark shadow-sm" id="btn-home-play">
+            <i class="bi bi-play-fill me-1"></i> Play Game
+          </button>
+          <button class="btn btn-outline-light btn-lg px-4 py-2 fw-bold d-none" id="btn-home-resume">
+            <i class="bi bi-arrow-clockwise me-1"></i> Resume Session
+          </button>
+          <button class="btn btn-outline-secondary btn-lg px-3 py-2" id="btn-home-rules">
+            <i class="bi bi-info-circle me-1"></i> Rules
+          </button>
+          <button class="btn btn-outline-secondary btn-lg px-3 py-2" id="btn-home-shortcuts">
+            <i class="bi bi-keyboard me-1"></i> Shortcuts
+          </button>
+        </div>
+
+        <!-- Sample Board Preview -->
+        <div class="preview-board">
+          <div class="text-uppercase small fw-bold text-muted mb-2">Live Board Preview</div>
+          <div id="home-board-preview"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: GAME SETUP -->
+    <section id="view-setup" class="container py-4 d-none">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-9">
+          <div class="card p-4 bg-dark border-secondary shadow">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary">
+              <h3 class="fw-bold mb-0 text-warning"><i class="bi bi-sliders me-2"></i>Game Configuration</h3>
+              <button class="btn btn-outline-secondary btn-sm" id="btn-setup-back">
+                <i class="bi bi-arrow-left me-1"></i> Back to Home
+              </button>
+            </div>
+
+            <!-- Session Title -->
+            <div class="mb-3">
+              <label for="setup-game-title" class="form-label fw-bold">Session Game Title</label>
+              <input type="text" class="form-control" id="setup-game-title" value="Trivia Jeopardy" maxlength="60">
+            </div>
+
+            <!-- Teams Configuration -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label for="setup-team-count" class="form-label fw-bold mb-0">Participating Teams</label>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="small text-muted">Count:</span>
+                  <select class="form-select form-select-sm" id="setup-team-count" style="width: 100px;">
+                    <option value="1">1 Team</option>
+                    <option value="2" selected>2 Teams</option>
+                    <option value="3">3 Teams</option>
+                    <option value="4">4 Teams</option>
+                    <option value="5">5 Teams</option>
+                    <option value="6">6 Teams</option>
+                    <option value="7">7 Teams</option>
+                    <option value="8">8 Teams</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Team inputs container -->
+              <div class="row" id="setup-teams-list"></div>
+            </div>
+
+            <!-- Rules & Options -->
+            <div class="mb-4 pt-3 border-top border-secondary">
+              <h5 class="fw-bold text-light mb-3">Scoring & Gameplay Rules</h5>
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="setup-incorrect-deduction">
+                    <label class="form-check-label" for="setup-incorrect-deduction">
+                      <strong>Deduct points for incorrect answers</strong>
+                      <div class="small text-muted">If disabled, incorrect responses award 0 points.</div>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="setup-require-question">
+                    <label class="form-check-label" for="setup-require-question">
+                      <strong>Require question form</strong>
+                      <div class="small text-muted">Show a reminder for answers phrased as questions ("What is...").</div>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="setup-timer-enabled" checked>
+                    <label class="form-check-label" for="setup-timer-enabled">
+                      <strong>Enable Clue Countdown Timer</strong>
+                      <div class="small text-muted">Audible tick and progress bar for each clue.</div>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label for="setup-timer-duration" class="form-label small fw-bold mb-1">Timer Duration (Seconds)</label>
+                  <select class="form-select form-select-sm" id="setup-timer-duration">
+                    <option value="15">15 Seconds</option>
+                    <option value="20">20 Seconds</option>
+                    <option value="30" selected>30 Seconds</option>
+                    <option value="45">45 Seconds</option>
+                    <option value="60">60 Seconds</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex flex-wrap justify-content-between gap-2 pt-3 border-top border-secondary">
+              <button class="btn btn-outline-info" id="btn-setup-sample">
+                <i class="bi bi-box-arrow-in-down me-1"></i> Load Default Trivia Game
+              </button>
+              <button class="btn btn-warning btn-lg px-5 fw-bold text-dark" id="btn-setup-start">
+                <i class="bi bi-play-circle-fill me-1"></i> Start Game
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: MAIN JEOPARDY BOARD -->
+    <section id="view-board" class="board-container-wrapper d-none">
+      <!-- Top Board Bar -->
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2 px-1">
+        <div>
+          <span class="badge bg-primary me-2" id="board-round-title">Jeopardy Round</span>
+          <strong class="text-light" id="board-game-title">Trivia Jeopardy</strong>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span class="small text-warning fw-bold" id="board-remaining-clues">30 Clues Remaining</span>
+          <!-- Host Toolbar -->
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-secondary" id="btn-board-next-round" title="Advance Round">
+              <i class="bi bi-fast-forward-fill me-1"></i> Round
+            </button>
+            <button class="btn btn-outline-secondary" id="btn-board-adjust-scores" title="Manual Score Adjust">
+              <i class="bi bi-pencil-square me-1"></i> Scores
+            </button>
+            <button class="btn btn-outline-secondary" id="btn-board-history" title="Score History & Undo">
+              <i class="bi bi-clock-history me-1"></i> History
+            </button>
+            <button class="btn btn-outline-secondary" id="btn-board-undo" title="Undo Last Score">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+            <button class="btn btn-outline-danger" id="btn-board-reset" title="Reset Game Progress">
+              <i class="bi bi-x-circle"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scoreboard Bar -->
+      <div class="scoreboard-bar" id="board-scoreboard"></div>
+
+      <!-- Grid of Categories and Clues -->
+      <div id="main-board-container" class="mt-2"></div>
+    </section>
+
+    <!-- VIEW 4: FINAL JEOPARDY -->
+    <section id="view-final-jeopardy" class="container py-4 d-none">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+          <div class="card p-4 bg-dark border-warning shadow-lg text-center">
+            <span class="badge bg-warning text-dark align-self-center px-3 py-2 fw-bold text-uppercase mb-2">Final Round</span>
+            <h2 class="fw-black text-light mb-1">FINAL JEOPARDY</h2>
+            <div class="fs-4 text-warning fw-bold mb-4" id="fj-category-name">Category Name</div>
+
+            <!-- Step 1: Collect Secret Wagers -->
+            <div id="fj-step-wagers">
+              <p class="text-muted mb-3">Host instructions: Each eligible team enters a secret wager up to their current point total.</p>
+              <div class="row text-start" id="fj-wagers-container"></div>
+              <button class="btn btn-warning btn-lg px-4 fw-bold text-dark mt-3" id="btn-fj-submit-wagers">
+                <i class="bi bi-lock-fill me-1"></i> Lock Wagers & Reveal Clue
+              </button>
+            </div>
+
+            <!-- Step 2: Final Clue Display -->
+            <div id="fj-step-clue" class="d-none">
+              <!-- Timer -->
+              <div class="progress mb-3 bg-secondary" style="height: 10px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" id="fj-timer-progress" style="width: 100%;"></div>
+              </div>
+              <div class="small text-warning fw-bold mb-3" id="fj-timer-seconds">30s</div>
+
+              <div class="p-4 bg-surface rounded border border-secondary mb-4">
+                <p class="fs-3 fw-bold text-light mb-0" id="fj-clue-text">Final Clue Text</p>
+              </div>
+
+              <button class="btn btn-outline-warning btn-lg px-4 fw-bold" id="btn-fj-reveal-answer">
+                <i class="bi bi-eye-fill me-1"></i> Reveal Answer
+              </button>
+            </div>
+
+            <!-- Step 3: Reveal Answer & Judge Teams -->
+            <div id="fj-step-evaluate" class="d-none text-start mt-4">
+              <div class="answer-reveal-box mb-4" id="fj-answer-box">
+                <div class="answer-title">Correct Final Response:</div>
+                <div class="answer-text text-success" id="fj-answer-text">Answer Text</div>
+                <div class="small text-muted mt-1" id="fj-answer-explanation"></div>
+              </div>
+
+              <h5 class="fw-bold text-light mb-2">Score Team Responses:</h5>
+              <div class="row" id="fj-evaluation-list"></div>
+
+              <div class="text-center mt-3">
+                <button class="btn btn-success btn-lg px-5 fw-bold" id="btn-fj-commit-results">
+                  <i class="bi bi-check-circle-fill me-1"></i> Commit Results & View Champion
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: RESULTS SCREEN -->
+    <section id="view-results" class="container py-4 d-none">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-9 text-center">
+          <div id="results-winner-banner" class="mb-4"></div>
+
+          <!-- Podium Cards -->
+          <div class="row justify-content-center g-3 mb-4" id="podium-container"></div>
+
+          <!-- Summary Stats -->
+          <div class="card p-3 bg-dark border-secondary mb-4">
+            <div class="row g-2 text-center">
+              <div class="col-4">
+                <div class="small text-muted">Completed Clues</div>
+                <div class="fs-4 fw-bold text-light" id="stat-completed-clues">0</div>
+              </div>
+              <div class="col-4">
+                <div class="small text-muted">Total Points Awarded</div>
+                <div class="fs-4 fw-bold text-warning" id="stat-total-points">$0</div>
+              </div>
+              <div class="col-4">
+                <div class="small text-muted">Game Duration</div>
+                <div class="fs-4 fw-bold text-light" id="stat-game-duration">0m 0s</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results Actions -->
+          <div class="d-flex flex-wrap justify-content-center gap-3">
+            <button class="btn btn-outline-secondary px-3 py-2" id="btn-results-history">
+              <i class="bi bi-clock-history me-1"></i> Review Score History
+            </button>
+            <button class="btn btn-warning px-4 py-2 fw-bold text-dark" id="btn-results-play-again">
+              <i class="bi bi-arrow-repeat me-1"></i> Play Again
+            </button>
+            <button class="btn btn-outline-light px-4 py-2" id="btn-results-return-home">
+              <i class="bi bi-house-door-fill me-1"></i> Return Home
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- CLUE PRESENTATION MODAL -->
+  <div class="modal fade" id="cluePresentationModal" tabindex="-1" aria-labelledby="cluePresentationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header clue-modal-header d-flex justify-content-between align-items-center">
+          <div>
+            <span class="badge bg-secondary me-2" id="clue-modal-category">Category</span>
+            <span class="badge bg-primary" id="clue-modal-points">$100</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-dark border border-secondary text-warning" id="clue-timer-seconds">30s</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-clue-dismiss" title="Return to board without scoring" aria-label="Close">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Timer visual progress bar -->
+        <div class="progress" style="height: 4px; border-radius: 0;">
+          <div class="progress-bar bg-warning" id="clue-timer-progress" style="width: 100%;"></div>
+        </div>
+
+        <div class="modal-body text-center p-4">
+          <!-- Optional Image -->
+          <div id="clue-modal-image-container" class="d-none"></div>
+
+          <!-- Question Reminder Notice -->
+          <div id="clue-question-reminder" class="small text-info mb-2 d-none">
+            <i class="bi bi-info-circle me-1"></i> Reminder: Answer must be phrased in the form of a question!
+          </div>
+
+          <!-- Clue Text -->
+          <div class="clue-text-body" id="clue-modal-text">Clue text goes here...</div>
+
+          <!-- Hidden / Revealed Answer Box -->
+          <div id="clue-modal-answer-container" style="display: none;">
+            <div class="answer-reveal-box text-start">
+              <div class="answer-title">Correct Response:</div>
+              <div class="answer-text" id="clue-modal-answer-text">Answer text</div>
+              <div class="small text-muted mt-1" id="clue-modal-explanation"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clue Modal Actions -->
+        <div class="modal-footer flex-column p-3 border-secondary">
+          <!-- Team selector for scoring -->
+          <div class="w-100 d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+            <span class="small text-muted fw-bold">Select Active Team:</span>
+            <div class="d-flex flex-wrap gap-1" id="clue-team-selector"></div>
+          </div>
+
+          <div class="w-100 d-flex flex-wrap justify-content-between gap-2">
+            <!-- Reveal Answer Button (Initial state) -->
+            <button class="btn btn-warning px-4 fw-bold text-dark" id="btn-clue-reveal">
+              <i class="bi bi-eye-fill me-1"></i> Reveal Answer (R)
+            </button>
+
+            <!-- Correct / Incorrect / Skip (Visible after reveal) -->
+            <div id="clue-modal-actions" class="d-flex flex-wrap gap-2 d-none">
+              <button class="btn btn-success fw-bold px-3" id="btn-clue-correct">
+                <i class="bi bi-check-lg me-1"></i> Correct
+              </button>
+              <button class="btn btn-danger fw-bold px-3" id="btn-clue-incorrect">
+                <i class="bi bi-x-lg me-1"></i> Incorrect
+              </button>
+              <button class="btn btn-outline-secondary px-3" id="btn-clue-skip">
+                <i class="bi bi-skip-forward me-1"></i> Pass / Skip
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAILY DOUBLE MODAL -->
+  <div class="modal fade" id="dailyDoubleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-warning daily-double-card text-center p-4">
+        <div class="daily-double-title mb-2">★ DAILY DOUBLE ★</div>
+        <p class="fs-5 text-light mb-3">
+          Eligible: <strong id="dd-team-name">Team</strong>
+        </p>
+
+        <div class="bg-dark p-3 rounded border border-warning mb-3 text-start">
+          <label for="dd-wager-input" class="form-label text-warning small fw-bold mb-1">
+            Enter Wager (Maximum: <span id="dd-max-wager">$1,000</span>):
+          </label>
+          <div class="input-group">
+            <span class="input-group-text bg-secondary border-0 text-light">$</span>
+            <input type="number" class="form-control bg-dark text-light border-warning" id="dd-wager-input" min="5" value="500">
+          </div>
+          <div class="small text-muted mt-1">Minimum wager is $5.</div>
+        </div>
+
+        <button class="btn btn-light btn-lg fw-bold text-dark w-100" id="btn-confirm-dd-wager">
+          Confirm Wager & See Clue
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROUND TRANSITION SPLASH -->
+  <div id="round-transition-overlay" class="round-transition-overlay d-none text-center">
+    <div>
+      <div class="round-next-title mb-2">ROUND 2</div>
+      <p class="lead text-light round-next-desc">Points are doubled!</p>
+    </div>
+  </div>
+
+  <!-- SCORE TRANSACTION HISTORY MODAL -->
+  <div class="modal fade" id="scoreHistoryModal" tabindex="-1" aria-labelledby="scoreHistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold" id="scoreHistoryModalLabel"><i class="bi bi-clock-history me-2"></i>Score History & Audit Ledger</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-0">
+          <div class="table-responsive" style="max-height: 400px;">
+            <table class="table table-dark table-striped table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Team</th>
+                  <th>Change</th>
+                  <th>New Score</th>
+                  <th>Reason</th>
+                </tr>
+              </thead>
+              <tbody id="scoreHistoryTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANUAL SCORE ADJUSTMENT MODAL -->
+  <div class="modal fade" id="scoreAdjustmentModal" tabindex="-1" aria-labelledby="scoreAdjustmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold" id="scoreAdjustmentModalLabel"><i class="bi bi-pencil-square me-2"></i>Host Score Adjustments</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="scoreAdjustmentList"></div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RULES MODAL -->
+  <div class="modal fade" id="rulesModal" tabindex="-1" aria-labelledby="rulesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold" id="rulesModalLabel"><i class="bi bi-info-circle me-2"></i>How to Play Trivia Jeopardy</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ol class="ps-3 mb-0">
+            <li class="mb-2"><strong>The Board:</strong> Categories are shown across the columns. Point values increase by row according to clue difficulty.</li>
+            <li class="mb-2"><strong>Active Team:</strong> The active team chooses an available tile. The host reads the clue aloud.</li>
+            <li class="mb-2"><strong>Evaluating Answers:</strong> The host reveals the correct response. Award points for correct responses. If deduction is enabled, incorrect responses deduct that clue's point value.</li>
+            <li class="mb-2"><strong>Daily Double:</strong> A secret tile allowing the active team to wager up to their current point total (or the board maximum).</li>
+            <li class="mb-2"><strong>Double Jeopardy:</strong> A second round featuring new categories with doubled point values.</li>
+            <li class="mb-2"><strong>Final Jeopardy:</strong> One decisive final question where all teams place confidential wagers before the clue is revealed!</li>
+          </ol>
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got It</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORTCUTS MODAL -->
+  <div class="modal fade" id="shortcutsModal" tabindex="-1" aria-labelledby="shortcutsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold" id="shortcutsModalLabel"><i class="bi bi-keyboard me-2"></i>Keyboard Shortcuts</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-dark table-sm mb-0">
+            <tbody>
+              <tr><td><kbd>Arrow Keys</kbd></td><td>Navigate board grid tiles</td></tr>
+              <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>Select focused tile</td></tr>
+              <tr><td><kbd>R</kbd></td><td>Reveal active clue answer</td></tr>
+              <tr><td><kbd>M</kbd></td><td>Toggle sound effects mute</td></tr>
+              <tr><td><kbd>F</kbd></td><td>Toggle fullscreen display</td></tr>
+              <tr><td><kbd>1</kbd> - <kbd>8</kbd></td><td>Select active team 1 through 8</td></tr>
+              <tr><td><kbd>Esc</kbd></td><td>Dismiss modal dialog</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UNIVERSAL APP DIALOG MODAL -->
+  <div class="modal fade" id="appDialogModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold" id="appDialogModalTitle">Notice</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="appDialogModalBody"></div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UNIVERSAL APP CONFIRM MODAL -->
+  <div class="modal fade" id="appConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title fw-bold" id="appConfirmModalTitle">Confirm</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="appConfirmModalBody"></div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="appConfirmModalBtn">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center py-3 border-top border-secondary mt-auto text-muted small">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center">
+      <span>Trivia Jeopardy &copy; 2026. Unofficial trivia game application for educational and recreational use.</span>
+      <a href="admin.html" class="text-secondary text-decoration-none" title="Admin CMS Panel">
+        <i class="bi bi-gear-fill me-1"></i> Admin Panel
+      </a>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <!-- GSAP CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <!-- Bootstrap 5 Bundle JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Local Game Application Modules -->
+  <script src="assets/js/sample-data.js"></script>
+  <script src="assets/js/password-auth.js"></script>
+  <script src="assets/js/game-state.js"></script>
+  <script src="assets/js/scoring.js"></script>
+  <script src="assets/js/animations.js"></script>
+  <script src="assets/js/persistence.js"></script>
+  <script src="assets/js/game-engine.js"></script>
+  <script src="assets/js/board.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

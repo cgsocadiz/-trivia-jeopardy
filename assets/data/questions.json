@@ -1,0 +1,598 @@
+{
+  "schemaVersion": 1,
+  "adminAuth": {
+    "algorithm": "PBKDF2",
+    "hashAlgorithm": "SHA-256",
+    "iterations": 600000,
+    "salt": "a47b23bc46432463091b2f81681aedd2",
+    "passwordHash": "a919f60db3851410663863c14c3e5e8afaf2d05d82bc090643f409c6b6a89780"
+  },
+  "game": {
+    "id": "trivia-jeopardy-master",
+    "title": "Trivia Jeopardy",
+    "settings": {
+      "incorrectAnswerDeduction": false,
+      "requireQuestionForm": false,
+      "dailyDoubleEnabled": true,
+      "finalJeopardyEnabled": true,
+      "timerEnabled": true,
+      "timerSeconds": 30,
+      "soundEnabled": true
+    },
+    "rounds": [
+      {
+        "id": "round-1",
+        "title": "Jeopardy Round",
+        "multiplier": 1,
+        "categories": [
+          {
+            "id": "cat-gk",
+            "name": "General Knowledge",
+            "clues": [
+              {
+                "id": "gk-100",
+                "points": 100,
+                "clue": "What is the primary color of the center circle in the Japanese national flag?",
+                "answer": "Red",
+                "explanation": "The red disc represents the sun and is called the Hinomaru.",
+                "dailyDouble": false
+              },
+              {
+                "id": "gk-200",
+                "points": 200,
+                "clue": "Which traditional anniversary metal represents 25 years of marriage?",
+                "answer": "Silver",
+                "explanation": "The 25th anniversary is universally celebrated as the Silver Jubilee.",
+                "dailyDouble": false
+              },
+              {
+                "id": "gk-300",
+                "points": 300,
+                "clue": "How many dots appear on a standard six-sided die?",
+                "answer": "21",
+                "explanation": "The sum of 1 through 6 is 1 + 2 + 3 + 4 + 5 + 6 = 21 pips.",
+                "dailyDouble": false
+              },
+              {
+                "id": "gk-400",
+                "points": 400,
+                "clue": "What is the only letter in the English alphabet that does not appear in the periodic table of elements?",
+                "answer": "The letter J",
+                "explanation": "No chemical element symbol or name uses the letter J.",
+                "dailyDouble": false
+              },
+              {
+                "id": "gk-500",
+                "points": 500,
+                "clue": "What term describes a word or phrase formed by rearranging the letters of another?",
+                "answer": "Anagram",
+                "explanation": "For example, 'cinema' is an anagram of 'iceman'.",
+                "dailyDouble": false
+              }
+            ]
+          },
+          {
+            "id": "cat-sci",
+            "name": "Science & Nature",
+            "clues": [
+              {
+                "id": "sci-100",
+                "points": 100,
+                "clue": "What gas do plants absorb from the atmosphere during photosynthesis?",
+                "answer": "Carbon Dioxide (CO2)",
+                "explanation": "Plants take in carbon dioxide and release oxygen as a byproduct.",
+                "dailyDouble": false
+              },
+              {
+                "id": "sci-200",
+                "points": 200,
+                "clue": "What is the hardest naturally occurring mineral on Earth?",
+                "answer": "Diamond",
+                "explanation": "Diamond rates a maximum of 10 on the Mohs hardness scale.",
+                "dailyDouble": false
+              },
+              {
+                "id": "sci-300",
+                "points": 300,
+                "clue": "Which human organ produces the hormone insulin?",
+                "answer": "The Pancreas",
+                "explanation": "Beta cells in the islets of Langerhans inside the pancreas produce insulin.",
+                "dailyDouble": false
+              },
+              {
+                "id": "sci-400",
+                "points": 400,
+                "clue": "What is the speed of light in a vacuum, rounded to the nearest thousand kilometers per second?",
+                "answer": "300,000 km/s (or 186,000 miles/s)",
+                "explanation": "The exact speed of light is 299,792,458 meters per second.",
+                "dailyDouble": false
+              },
+              {
+                "id": "sci-500",
+                "points": 500,
+                "clue": "What is the name of the phenomenon where an electric current produces a magnetic field?",
+                "answer": "Electromagnetism (or Ampere's Law / Oersted's effect)",
+                "explanation": "Hans Christian Oersted discovered this connection in 1820.",
+                "dailyDouble": false
+              }
+            ]
+          },
+          {
+            "id": "cat-geo",
+            "name": "World Geography",
+            "clues": [
+              {
+                "id": "geo-100",
+                "points": 100,
+                "clue": "What is the capital city of Australia?",
+                "answer": "Canberra",
+                "explanation": "Canberra was selected as a compromise between Sydney and Melbourne in 1908.",
+                "dailyDouble": false
+              },
+              {
+                "id": "geo-200",
+                "points": 200,
+                "clue": "Which river flows through the Grand Canyon?",
+                "answer": "The Colorado River",
+                "explanation": "The Colorado River carved the canyon over millions of years.",
+                "dailyDouble": false
+              },
+              {
+                "id": "geo-300",
+                "points": 300,
+                "clue": "Which country has the longest coastline in the world?",
+                "answer": "Canada",
+                "explanation": "Canada's coastline spans over 202,080 kilometers (125,567 miles).",
+                "dailyDouble": false
+              },
+              {
+                "id": "geo-400",
+                "points": 400,
+                "clue": "What is the deepest lake in the world, holding roughly 20% of the world's unfrozen surface freshwater?",
+                "answer": "Lake Baikal",
+                "explanation": "Located in Siberia, Russia, Lake Baikal reaches a depth of 1,642 meters (5,387 ft).",
+                "dailyDouble": false
+              },
+              {
+                "id": "geo-500",
+                "points": 500,
+                "clue": "What is the only country in the world that borders both the Caspian Sea and the Persian Gulf?",
+                "answer": "Iran",
+                "explanation": "Iran has a northern shore on the Caspian Sea and a southern coast on the Persian Gulf.",
+                "dailyDouble": false
+              }
+            ]
+          },
+          {
+            "id": "cat-hist",
+            "name": "History",
+            "clues": [
+              {
+                "id": "hist-100",
+                "points": 100,
+                "clue": "In which year did the Titanic sink after striking an iceberg in the North Atlantic?",
+                "answer": "1912",
+                "explanation": "The disaster occurred in the early morning of April 15, 1912.",
+                "dailyDouble": false
+              },
+              {
+                "id": "hist-200",
+                "points": 200,
+                "clue": "Who was the first emperor of the Roman Empire?",
+                "answer": "Augustus (Octavian)",
+                "explanation": "He took the name Augustus in 27 BC after the fall of the Roman Republic.",
+                "dailyDouble": false
+              },
+              {
+                "id": "hist-300",
+                "points": 300,
+                "clue": "Which English monarch signed the Magna Carta in 1215 at Runnymede?",
+                "answer": "King John",
+                "explanation": "Barons forced King John to grant liberties and limit monarchical power.",
+                "dailyDouble": false
+              },
+              {
+                "id": "hist-400",
+                "points": 400,
+                "clue": "What 1944 military operation was the largest amphibious invasion in history?",
+                "answer": "Operation Overlord (or D-Day / Normandy Landings)",
+                "explanation": "Allied forces landed on the beaches of Normandy, France, on June 6, 1944.",
+                "dailyDouble": true
+              },
+              {
+                "id": "hist-500",
+                "points": 500,
+                "clue": "Which Mesoamerican civilization built the great ceremonial city of Teotihuacan?",
+                "answer": "The Teotihuacanos (Pre-Aztec Mesoamerican culture)",
+                "explanation": "It flourished between 100 BCE and 650 CE; the Aztecs later discovered its ruins.",
+                "dailyDouble": false
+              }
+            ]
+          },
+          {
+            "id": "cat-tech",
+            "name": "Technology",
+            "clues": [
+              {
+                "id": "tech-100",
+                "points": 100,
+                "clue": "What does the abbreviation 'HTTP' stand for in web addresses?",
+                "answer": "Hypertext Transfer Protocol",
+                "explanation": "HTTP is the foundation of data communication for the World Wide Web.",
+                "dailyDouble": false
+              },
+              {
+                "id": "tech-200",
+                "points": 200,
+                "clue": "Who is credited with inventing the World Wide Web while working at CERN in 1989?",
+                "answer": "Sir Tim Berners-Lee",
+                "explanation": "He created HTML, HTTP, and the first web browser and web server.",
+                "dailyDouble": false
+              },
+              {
+                "id": "tech-300",
+                "points": 300,
+                "clue": "What is the name of the mascot penguin for the Linux operating system kernel?",
+                "answer": "Tux",
+                "explanation": "Tux was created by Larry Ewing in 1996 for Linus Torvalds.",
+                "dailyDouble": false
+              },
+              {
+                "id": "tech-400",
+                "points": 400,
+                "clue": "What programming language was originally developed under the code name 'Oak' by James Gosling?",
+                "answer": "Java",
+                "explanation": "Sun Microsystems released Java in 1995, named after Java coffee.",
+                "dailyDouble": false
+              },
+              {
+                "id": "tech-500",
+                "points": 500,
+                "clue": "Which computer architecture rule states that the number of transistors on a microchip doubles roughly every two years?",
+                "answer": "Moore's Law",
+                "explanation": "Formulated by Intel co-founder Gordon Moore in 1965.",
+                "dailyDouble": false
+              }
+            ]
+          },
+          {
+            "id": "cat-ent",
+            "name": "Movies & Entertainment",
+            "clues": [
+              {
+                "id": "ent-100",
+                "points": 100,
+                "clue": "Which 1994 film features the quote: 'Life is like a box of chocolates'?",
+                "answer": "Forrest Gump",
+                "explanation": "Tom Hanks portrayed the title character in this Academy Award-winning film.",
+                "dailyDouble": false
+              },
+              {
+                "id": "ent-200",
+                "points": 200,
+                "clue": "Who directed the 1975 blockbuster thriller 'Jaws'?",
+                "answer": "Steven Spielberg",
+                "explanation": "It became the first theatrical film to gross over $100 million at the box office.",
+                "dailyDouble": false
+              },
+              {
+                "id": "ent-300",
+                "points": 300,
+                "clue": "Which animated Disney feature was the first to be nominated for the Academy Award for Best Picture?",
+                "answer": "Beauty and the Beast",
+                "explanation": "Released in 1991, it made history at the 64th Academy Awards.",
+                "dailyDouble": false
+              },
+              {
+                "id": "ent-400",
+                "points": 400,
+                "clue": "What fictional kingdom does Black Panther rule in the Marvel Cinematic Universe?",
+                "answer": "Wakanda",
+                "explanation": "Wakanda is a technologically advanced African nation rich in Vibranium.",
+                "dailyDouble": false
+              },
+              {
+                "id": "ent-500",
+                "points": 500,
+                "clue": "What was the first feature-length motion picture to feature synchronized dialogue, released in 1927?",
+                "answer": "The Jazz Singer",
+                "explanation": "Starring Al Jolson, it heralded the commercial ascendance of 'talkies'.",
+                "dailyDouble": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "round-2",
+        "title": "Double Jeopardy Round",
+        "multiplier": 2,
+        "categories": [
+          {
+            "id": "cat-lit",
+            "name": "Literature & Books",
+            "clues": [
+              {
+                "id": "lit-200",
+                "points": 200,
+                "clue": "Which Shakespeare play opens with the line: 'Now is the winter of our discontent'?",
+                "answer": "Richard III",
+                "explanation": "Spoken by Richard, Duke of Gloucester, in the opening soliloquy.",
+                "dailyDouble": false
+              },
+              {
+                "id": "lit-400",
+                "points": 400,
+                "clue": "In Herman Melville's 'Moby-Dick', what is the name of Captain Ahab's whaling ship?",
+                "answer": "The Pequod",
+                "explanation": "Named after the Pequot Native American tribe of Massachusetts.",
+                "dailyDouble": false
+              },
+              {
+                "id": "lit-600",
+                "points": 600,
+                "clue": "Who wrote the dystopian novel 'Brave New World', published in 1932?",
+                "answer": "Aldous Huxley",
+                "explanation": "The novel depicts a futuristic World State powered by technological conditioning and soma.",
+                "dailyDouble": false
+              },
+              {
+                "id": "lit-800",
+                "points": 800,
+                "clue": "What real-life French penal colony is central to Henri Charrière's famous autobiographical novel?",
+                "answer": "Devil's Island (or French Guiana)",
+                "explanation": "The novel is titled 'Papillon' and describes his daring escapes.",
+                "dailyDouble": false
+              },
+              {
+                "id": "lit-1000",
+                "points": 1000,
+                "clue": "Which 19th-century epic Russian novel contains over 500 characters and ends with an essay on the philosophy of history?",
+                "answer": "War and Peace",
+                "explanation": "Written by Leo Tolstoy and published in its entirety in 1869.",
+                "dailyDouble": false
+              }
+            ]
+          },
+          {
+            "id": "cat-mus",
+            "name": "Music & Soundtracks",
+            "clues": [
+              {
+                "id": "mus-200",
+                "points": 200,
+                "clue": "Which musical artist released the best-selling studio album of all time, 'Thriller', in 1982?",
+                "answer": "Michael Jackson",
+                "explanation": "'Thriller' produced seven top-10 Billboard singles and sold over 70 million copies.",
+                "dailyDouble": false
+              },
+              {
+                "id": "mus-400",
+                "points": 400,
+                "clue": "What classical composer wrote his famous Symphony No. 9 while completely deaf?",
+                "answer": "Ludwig van Beethoven",
+                "explanation": "Premiered in Vienna in 1824, featuring the famous 'Ode to Joy'.",
+                "dailyDouble": false
+              },
+              {
+                "id": "mus-600",
+                "points": 600,
+                "clue": "Which composer composed the iconic film scores for 'Star Wars', 'Indiana Jones', and 'Jurassic Park'?",
+                "answer": "John Williams",
+                "explanation": "Williams has received 54 Academy Award nominations, the most of any living person.",
+                "dailyDouble": false
+              },
+              {
+                "id": "mus-800",
+                "points": 800,
+                "clue": "What musical term directs a musician to play gradually louder?",
+                "answer": "Crescendo",
+                "explanation": "Derived from the Italian word meaning 'growing' or 'increasing'.",
+                "dailyDouble": false
+              },
+              {
+                "id": "mus-1000",
+                "points": 1000,
+                "clue": "Which opera by Wolfgang Amadeus Mozart features the famous Queen of the Night aria?",
+                "answer": "The Magic Flute (Die Zauberflöte)",
+                "explanation": "The aria is formally known as 'Der Hölle Rache kocht in meinem Herzen'.",
+                "dailyDouble": false
+              }
+            ]
+          },
+          {
+            "id": "cat-food",
+            "name": "Food & Drink of the World",
+            "clues": [
+              {
+                "id": "food-200",
+                "points": 200,
+                "clue": "What type of pastry is traditionally used to make baklava?",
+                "answer": "Phyllo (Filo) dough",
+                "explanation": "Phyllo consists of paper-thin sheets layered with butter and chopped nuts.",
+                "dailyDouble": false
+              },
+              {
+                "id": "food-400",
+                "points": 400,
+                "clue": "Which spice, harvested by hand from crocus flowers, is the most expensive in the world by weight?",
+                "answer": "Saffron",
+                "explanation": "It takes over 75,000 crocus flowers to produce a single pound of saffron threads.",
+                "dailyDouble": false
+              },
+              {
+                "id": "food-600",
+                "points": 600,
+                "clue": "What Mexican spirit must be made primarily from the blue agave plant in specific designated regions?",
+                "answer": "Tequila",
+                "explanation": "Strict Mexican Denomination of Origin laws protect Tequila production.",
+                "dailyDouble": false
+              },
+              {
+                "id": "food-800",
+                "points": 800,
+                "clue": "Which country is the birthplace of the creamy dessert Tiramisu?",
+                "answer": "Italy",
+                "explanation": "Originating in the Veneto region, its name means 'pick me up'.",
+                "dailyDouble": false
+              },
+              {
+                "id": "food-1000",
+                "points": 1000,
+                "clue": "What Japanese culinary art involves preparing and serving dangerous fugu (blowfish) safely?",
+                "answer": "Fugu preparation (by licensed Fugu chefs)",
+                "explanation": "The chef must carefully remove organs containing lethal tetrodotoxin.",
+                "dailyDouble": false
+              }
+            ]
+          },
+          {
+            "id": "cat-sport",
+            "name": "Sports & Games",
+            "clues": [
+              {
+                "id": "sport-200",
+                "points": 200,
+                "clue": "How many players are on the field for one team in a standard association football (soccer) match?",
+                "answer": "11 players",
+                "explanation": "This includes 10 outfield players and one goalkeeper.",
+                "dailyDouble": false
+              },
+              {
+                "id": "sport-400",
+                "points": 400,
+                "clue": "In chess, which piece can leap over other pieces during its movement?",
+                "answer": "The Knight",
+                "explanation": "The knight moves in an L-shape and can jump over occupied squares.",
+                "dailyDouble": false
+              },
+              {
+                "id": "sport-600",
+                "points": 600,
+                "clue": "What city hosted the first modern Olympic Games in 1896?",
+                "answer": "Athens, Greece",
+                "explanation": "The Panathenaic Stadium hosted the revival of the ancient Olympic Games.",
+                "dailyDouble": false
+              },
+              {
+                "id": "sport-800",
+                "points": 800,
+                "clue": "What is the term in bowling for rolling three consecutive strikes?",
+                "answer": "A Turkey",
+                "explanation": "The phrase dates back to the late 19th century when lanes awarded an actual turkey.",
+                "dailyDouble": false
+              },
+              {
+                "id": "sport-1000",
+                "points": 1000,
+                "clue": "Which tennis tournament is the only Grand Slam event played on outdoor clay courts?",
+                "answer": "The French Open (Roland-Garros)",
+                "explanation": "Held annually in Paris, named after aviator Roland Garros.",
+                "dailyDouble": false
+              }
+            ]
+          },
+          {
+            "id": "cat-space",
+            "name": "Space & Astronomy",
+            "clues": [
+              {
+                "id": "space-200",
+                "points": 200,
+                "clue": "Which planet in our solar system has the most prominent and extensive ring system?",
+                "answer": "Saturn",
+                "explanation": "Saturn's rings are composed mainly of billions of chunks of ice and rock.",
+                "dailyDouble": false
+              },
+              {
+                "id": "space-400",
+                "points": 400,
+                "clue": "What is the boundary around a black hole beyond which nothing, not even light, can escape?",
+                "answer": "The Event Horizon",
+                "explanation": "The distance from the center to the event horizon is the Schwarzschild radius.",
+                "dailyDouble": false
+              },
+              {
+                "id": "space-600",
+                "points": 600,
+                "clue": "What is the name of the closest spiral galaxy to our own Milky Way galaxy?",
+                "answer": "The Andromeda Galaxy (M31)",
+                "explanation": "Located approximately 2.5 million light-years from Earth.",
+                "dailyDouble": true
+              },
+              {
+                "id": "space-800",
+                "points": 800,
+                "clue": "Which moon in our solar system is known to have liquid methane and ethane lakes on its surface?",
+                "answer": "Titan (moon of Saturn)",
+                "explanation": "The Cassini-Huygens mission confirmed Titan's hydrocarbon hydrological cycle.",
+                "dailyDouble": false
+              },
+              {
+                "id": "space-1000",
+                "points": 1000,
+                "clue": "In what year did the Voyager 1 space probe become the first human-made object to cross into interstellar space?",
+                "answer": "2012",
+                "explanation": "NASA announced on September 12, 2013, that Voyager 1 had crossed the heliopause in August 2012.",
+                "dailyDouble": false
+              }
+            ]
+          },
+          {
+            "id": "cat-myth",
+            "name": "Myths & Legends",
+            "clues": [
+              {
+                "id": "myth-200",
+                "points": 200,
+                "clue": "In Greek mythology, who was the king of the gods who wielded lightning bolts?",
+                "answer": "Zeus",
+                "explanation": "Zeus ruled from Mount Olympus with his wife Hera.",
+                "dailyDouble": false
+              },
+              {
+                "id": "myth-400",
+                "points": 400,
+                "clue": "What is the name of the magical hammer wielded by the Norse god Thor?",
+                "answer": "Mjölnir",
+                "explanation": "Forged by dwarven brothers Brokkr and Sindri, Mjölnir can level mountains.",
+                "dailyDouble": false
+              },
+              {
+                "id": "myth-600",
+                "points": 600,
+                "clue": "In Egyptian mythology, which god of the afterlife weighed the hearts of the deceased against the feather of Ma'at?",
+                "answer": "Anubis (or Osiris)",
+                "explanation": "Jackal-headed Anubis performed the weighing ceremony at the scales of justice.",
+                "dailyDouble": false
+              },
+              {
+                "id": "myth-800",
+                "points": 800,
+                "clue": "What creature from Greek legend had the body of a lion and the head of a human, and posed a famous riddle to travelers?",
+                "answer": "The Sphinx",
+                "explanation": "Oedipus solved her riddle: 'What goes on four feet in the morning, two feet at noon, and three feet in the evening?' (Man).",
+                "dailyDouble": true
+              },
+              {
+                "id": "myth-1000",
+                "points": 1000,
+                "clue": "In Arthurian legend, what was the mystical isle to which King Arthur was taken to heal after the Battle of Camlann?",
+                "answer": "Avalon",
+                "explanation": "Avalon is often associated with Glastonbury Tor and is where Excalibur was forged.",
+                "dailyDouble": false
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "finalJeopardy": {
+      "enabled": true,
+      "category": "World Landmarks",
+      "clue": "Constructed for the 1889 World's Fair, this 330-meter wrought-iron lattice tower was initially criticized by leading French artists but became an iconic global symbol.",
+      "answer": "The Eiffel Tower",
+      "explanation": "Designed by Gustave Eiffel's engineering firm, it was built to celebrate the centennial of the French Revolution."
+    }
+  }
+}
