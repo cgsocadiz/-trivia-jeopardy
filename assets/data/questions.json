@@ -9,7 +9,7 @@
   },
   "game": {
     "id": "trivia-jeopardy-master",
-    "title": "Trivia Jeopardy",
+    "title": "Shaamei",
     "settings": {
       "incorrectAnswerDeduction": false,
       "requireQuestionForm": false,
@@ -300,6 +300,11 @@
                 "dailyDouble": false
               }
             ]
+          },
+          {
+            "id": "cat-mvrgquka",
+            "name": "test",
+            "clues": []
           }
         ]
       },
