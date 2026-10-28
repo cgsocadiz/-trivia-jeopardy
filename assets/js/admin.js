@@ -275,7 +275,7 @@ const AdminApp = (function () {
    */
   async function loadQuestionsData() {
     try {
-      const response = await fetch('assets/data/questions.json');
+      const response = await fetch('assets/data/questions.json?_t=' + Date.now(), { cache: 'no-store' });
       if (!response.ok) {
         throw new Error(`HTTP ${response.status} ${response.statusText}`);
       }
@@ -337,16 +337,10 @@ const AdminApp = (function () {
       if (authResult.success) {
         isAuthenticated = true;
 
-        // Auto-restore previously saved edits from localStorage so user never loses their changes on refresh
-        const savedCustom = Persistence.loadCustomGame();
-        const savedDraft = Persistence.loadAdminDraft();
-        if (savedCustom && savedCustom.game) {
-          editorData = JSON.parse(JSON.stringify(savedCustom));
-        } else if (savedDraft && savedDraft.game) {
-          editorData = JSON.parse(JSON.stringify(rawSourceData));
-          editorData.game = JSON.parse(JSON.stringify(savedDraft.game));
-        } else {
-          editorData = JSON.parse(JSON.stringify(rawSourceData));
+        // Load latest fresh live data from GitHub
+        editorData = JSON.parse(JSON.stringify(rawSourceData));
+        if (Persistence.hasAdminDraft() && els.restoreDraftBtn) {
+          els.restoreDraftBtn.classList.remove('d-none');
         }
 
         // Hide login, show dashboard
@@ -952,6 +946,12 @@ const AdminApp = (function () {
         }
         throw new Error(errJson.message || `HTTP ${putResp.status} ${putResp.statusText}`);
       }
+
+      rawSourceData = JSON.parse(JSON.stringify(editorData));
+      Persistence.clearAdminDraft();
+      Persistence.clearCustomGame();
+      if (els.restoreDraftBtn) els.restoreDraftBtn.classList.add('d-none');
+      setDraftBadge('Live on GitHub');
 
       showAppModal(
         'Synced to GitHub!',

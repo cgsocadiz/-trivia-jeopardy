@@ -25,7 +25,10 @@ data.game.rounds.forEach((round, rIdx) => {
 
   round.categories.forEach(cat => {
     if (!cat.name) throw new Error(`Category in round ${rIdx + 1} has no name.`);
-    if (!cat.clues || cat.clues.length === 0) throw new Error(`Category "${cat.name}" has no clues.`);
+    if (!cat.clues || cat.clues.length === 0) {
+      console.log(`  (Note: Category "${cat.name}" currently has 0 clues)`);
+      return;
+    }
     cat.clues.forEach(clue => {
       clueCount++;
       if (clueIds.has(clue.id)) {

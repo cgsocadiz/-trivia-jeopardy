@@ -95,24 +95,22 @@ const App = (function () {
 
   // --- Data Loading ---
   async function loadGameData() {
-    // 1. First check if customized game data is saved in this browser
-    const customData = Persistence.loadCustomGame();
-    if (customData && customData.game && Array.isArray(customData.game.rounds)) {
-      GameState.setGameData(customData);
-      renderHomePreview();
-      checkSavedSession();
-      return;
-    }
-
-    // 2. Otherwise load published questions.json
     try {
-      const resp = await fetch('assets/data/questions.json');
+      // Use cache-busting query parameter so all PCs and mobile devices always fetch the latest published questions from GitHub
+      const cacheBustUrl = `assets/data/questions.json?_t=${Date.now()}`;
+      const resp = await fetch(cacheBustUrl, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+      });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const data = await resp.json();
       GameState.setGameData(data);
     } catch (e) {
-      console.warn('Could not load questions.json over fetch (file:// mode or network issue). Using embedded sample data.', e);
-      if (window.DEFAULT_SAMPLE_QUESTIONS) {
+      console.warn('Could not load questions.json over fetch (file:// mode or offline). Trying local storage / fallback.', e);
+      const customData = Persistence.loadCustomGame();
+      if (customData && customData.game && Array.isArray(customData.game.rounds)) {
+        GameState.setGameData(customData);
+      } else if (window.DEFAULT_SAMPLE_QUESTIONS) {
         GameState.setGameData(JSON.parse(JSON.stringify(window.DEFAULT_SAMPLE_QUESTIONS)));
       } else {
         showAppModal('Loading Notice', 'Questions data file could not be loaded. Please ensure you are running on a local web server (e.g. VS Code Live Server) or deployed to GitHub Pages.', 'warning');
