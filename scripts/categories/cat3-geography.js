@@ -51,7 +51,7 @@ function getGeo() {
   const d3 = [
     ['The world\'s highest capital city above sea level', 'La Paz (administrative) / Quito (constitutional)', 'La Paz, Bolivia sits at approximately 3,640 meters.'],
     ['Southeastern Asian strait between the Malay Peninsula and Indonesian island of Sumatra', 'Strait of Malacca', 'One of the busiest shipping lanes in the world.'],
-    ['The only nation that occupies an entire continent', 'Australia', 'It is also the world\'s smallest continent.'],
+    ['What South American nation situated on the Atlantic coast south of Brazil has its capital at Montevideo?', 'Uruguay', 'Uruguay hosted and won the inaugural FIFA World Cup in 1930.'],
     ['Landlocked country in South America bordered by Brazil, Bolivia, and Argentina', 'Paraguay', 'Along with Bolivia, one of only two landlocked South American nations.'],
     ['Capital of New Zealand, known as the southernmost national capital in the world', 'Wellington', 'Replaced Auckland as capital in 1865.'],
     ['The river that forms part of the international border between the US and Mexico', 'Rio Grande (Rio Bravo del Norte)', 'Empties into the Gulf of Mexico.'],
@@ -110,7 +110,7 @@ function getGeo() {
     ['The mountain pass connecting Pakistan and Afghanistan through the Hindu Kush', 'Khyber Pass', 'Historic invasion and trade route between Central and South Asia.'],
     ['The capital of Tuvalu, one of the smallest and lowest-lying nations on Earth', 'Funafuti', 'Atoll consisting of 30 islets.'],
     ['The deep ocean trench off the coast of Puerto Rico that is the deepest point in the Atlantic Ocean', 'Puerto Rico Trench (Milwaukee Deep)', 'Reaches a depth of 8,376 meters (27,480 feet).'],
-    ['The capital of the Republic of the Congo (Congo-Brazzaville), facing Kinshasa across the river', 'Brazzaville', 'Named after Italian-French explorer Pierre Savorgnan de Brazza.'],
+    ['The capital of the Republic of the Congo facing Kinshasa across the Congo River', 'Brazzaville', 'Named after Italian-French explorer Pierre Savorgnan de Brazza.'],
     ['The archipelago off the southeastern tip of South America separated from the mainland by the Strait of Magellan', 'Tierra del Fuego', 'Shared between Chile and Argentina.'],
     ['The capital city of Liechtenstein, situated along the Rhine River', 'Vaduz', 'Seat of the reigning Prince of Liechtenstein.'],
     ['The Russian enclave wedged between Poland and Lithuania on the Baltic Sea', 'Kaliningrad Oblast', 'Formerly the East Prussian capital of Konigsberg.'],

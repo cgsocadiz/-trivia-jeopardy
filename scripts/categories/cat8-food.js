@@ -20,7 +20,7 @@ function getFood() {
     ['Baking ingredient produced by the fermentation of sugars into carbon dioxide and alcohol', 'Yeast (Saccharomyces cerevisiae)', 'Essential leavening agent for bread baking.'],
     ['Traditional Japanese soup made with a fermented soybean paste broth and dashi', 'Miso Soup', 'Typically garnished with tofu, seaweed (wakame), and scallions.'],
     ['The national dish of Spain cooked in a wide, shallow pan with rice, saffron, and meats or seafood', 'Paella', 'Originated in the region of Valencia around Lake Albufera.'],
-    ['Condiment made from crushed mustard seeds mixed with water, vinegar, and salt', 'Mustard', 'One of the oldest recorded condiments in culinary history.'],
+    ['Condiment made from crushed Brassica seeds mixed with vinegar and turmeric, famously paired with pretzels and hot dogs', 'Mustard', 'One of the oldest recorded condiments in culinary history.'],
     ['Green tea powder traditionally whisked in the Japanese tea ceremony (chanoyu)', 'Matcha', 'Shade-grown before harvest to increase theanine and chlorophyll levels.']
   ];
 

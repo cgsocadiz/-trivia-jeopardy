@@ -27,7 +27,7 @@ const d2 = [
   ['Famous battle of 1066 where William the Conqueror won the English crown', 'Battle of Hastings', 'It resulted in Norman rule over England.'],
   ['Inca citadel in Peru built in the 15th century, brought to international attention in 1911', 'Machu Picchu', 'It sits high in the Andes mountains.'],
   ['US policy announced in 1947 to contain Soviet geopolitical expansion during the Cold War', 'Truman Doctrine', 'Announced by President Harry S. Truman.'],
-  ['Ancient Greek city-state renowned for its fierce military and Spartan warriors', 'Sparta', 'Spartans fought against Persia at the Battle of Thermopylae.'],
+  ['Ancient Greek city-state renowned for its fierce hoplite warriors and King Leonidas', 'Sparta', 'Spartans fought against Persia at the Battle of Thermopylae.'],
   ['Treaty signed in 1919 that formally concluded World War I', 'Treaty of Versailles', 'It imposed heavy reparations and territorial losses on Germany.'],
   ['The first Roman Emperor, formerly known as Octavian', 'Augustus', 'He reigned from 27 BC until his death in AD 14.'],
   ['Leader of the Protestant Reformation who nailed his Ninety-five Theses to a church door in 1517', 'Martin Luther', 'He posted them in Wittenberg, Germany.'],

@@ -41,7 +41,7 @@ function getAnimals() {
     ['The bird famous for building intricate, brightly decorated architectural structures to attract mates', 'Bowerbird', 'Males decorate bowers with flowers, shells, and colored plastic.'],
     ['The term for an animal that is active primarily during twilight (dawn and dusk)', 'Crepuscular', 'Contrasted with diurnal (day) and nocturnal (night).'],
     ['The horn of a rhinoceros is made primarily of this structural protein, identical to human hair and nails', 'Keratin', 'Rhinoceros horns lack a bony core unlike true cattle horns.'],
-    ['The venomous Australian mammal, where males possess a venom-delivering spur on their hind legs', 'Platypus', 'Venom is strong enough to cause excruciating pain in humans.'],
+    ['What spiny egg-laying mammal native to Australia and New Guinea belongs to the order Monotremata alongside the platypus?', 'Echidna (Spiny Anteater)', 'Short-beaked and long-beaked echidnas are the only living monotremes besides the platypus.'],
     ['The deep-sea fish with bioluminescent photophore lures dangling from their heads to attract prey', 'Anglerfish', 'Females are drastically larger than parasitic dwarf males.'],
     ['The only species of bird known to be capable of flying backward and upside down', 'Hummingbird', 'Their wings rotate in a figure-eight pattern at up to 80 beats per second.'],
     ['The suborder of primates that includes lemurs, lorises, and galagos, characterized by wet noses', 'Strepsirrhini (Wet-nosed primates)', 'Distinguished from Haplorhini (dry-nosed primates, including monkeys and apes).']

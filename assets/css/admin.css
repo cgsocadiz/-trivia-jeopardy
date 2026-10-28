@@ -165,14 +165,44 @@ body {
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
 }
 
-/* Clues Table Styling */
+/* Clues Table Styling & Data Scrolling */
 .admin-table {
   color: var(--admin-text);
   background-color: transparent;
   margin-bottom: 0;
 }
 
-.admin-table th {
+/* Data-only scroll for Category List container */
+#admin-categories-list {
+  max-height: calc(100vh - 310px);
+  min-height: 280px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+}
+
+/* Data-only scroll for Clues Table container */
+.admin-card .table-responsive {
+  max-height: calc(100vh - 330px);
+  min-height: 280px;
+  overflow-y: auto;
+  overflow-x: auto;
+  border-radius: 0 0 10px 10px;
+}
+
+/* Category Library list inside modal */
+#category-library-list {
+  max-height: 52vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+}
+
+/* Sticky Header on Clues Table: Header stays fixed while rows scroll */
+.admin-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   background-color: var(--admin-surface-card);
   color: var(--admin-text-muted);
   font-size: 0.78rem;
@@ -181,6 +211,46 @@ body {
   letter-spacing: 0.05em;
   border-color: var(--admin-border);
   padding: 0.75rem 0.85rem;
+  box-shadow: 0 1px 0 var(--admin-border);
+}
+
+/* Internal elegant slim scrollbars */
+#admin-categories-list,
+.admin-card .table-responsive,
+#category-library-list,
+.preview-board-wrapper {
+  scrollbar-width: thin;
+  scrollbar-color: var(--admin-border) transparent;
+}
+
+#admin-categories-list::-webkit-scrollbar,
+.admin-card .table-responsive::-webkit-scrollbar,
+#category-library-list::-webkit-scrollbar,
+.preview-board-wrapper::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+#admin-categories-list::-webkit-scrollbar-track,
+.admin-card .table-responsive::-webkit-scrollbar-track,
+#category-library-list::-webkit-scrollbar-track,
+.preview-board-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#admin-categories-list::-webkit-scrollbar-thumb,
+.admin-card .table-responsive::-webkit-scrollbar-thumb,
+#category-library-list::-webkit-scrollbar-thumb,
+.preview-board-wrapper::-webkit-scrollbar-thumb {
+  background: var(--admin-border);
+  border-radius: 4px;
+}
+
+#admin-categories-list::-webkit-scrollbar-thumb:hover,
+.admin-card .table-responsive::-webkit-scrollbar-thumb:hover,
+#category-library-list::-webkit-scrollbar-thumb:hover,
+.preview-board-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--admin-accent);
 }
 
 .admin-table td {
@@ -351,5 +421,13 @@ body {
   .admin-card {
     padding: 1rem;
     border-radius: 10px;
+  }
+  #admin-categories-list {
+    max-height: 240px;
+    min-height: auto;
+  }
+  .admin-card .table-responsive {
+    max-height: 380px;
+    min-height: auto;
   }
 }

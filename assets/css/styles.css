@@ -444,3 +444,43 @@ html, body {
     transition-duration: 0.001s !important;
   }
 }
+
+/* Data-only scroll for multi-row setup containers: Container remains fixed while rows scroll */
+#setup-categories-list {
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+#setup-teams-list {
+  max-height: 220px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+#setup-categories-list::-webkit-scrollbar,
+#setup-teams-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+#setup-categories-list::-webkit-scrollbar-track,
+#setup-teams-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#setup-categories-list::-webkit-scrollbar-thumb,
+#setup-teams-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+#setup-categories-list::-webkit-scrollbar-thumb:hover,
+#setup-teams-list::-webkit-scrollbar-thumb:hover {
+  background: var(--board-gold);
+}

@@ -44,7 +44,7 @@ function getSports() {
     ['The sport governed by World Rugby where teams score tries and conversions', 'Rugby (Rugby Union / League)', 'Origin legend attributes the sport to William Webb Ellis at Rugby School.'],
     ['The country that won the inaugural FIFA World Cup in 1930, defeating Argentina in the final', 'Uruguay', 'Hosted the tournament in Montevideo.'],
     ['The legendary heavyweight boxing fight between Muhammad Ali and George Foreman in 1974 in Zaire', 'Rumble in the Jungle', 'Ali famously deployed his "rope-a-dope" strategy.'],
-    ['The sport in which the Ryder Cup is contested biennially between Europe and the United States', 'Golf', 'Named after English businessman Samuel Ryder.']
+    ['The Davis Cup is the premier international men\'s team tournament in which racquet sport?', 'Tennis', 'Founded in 1900 by Dwight F. Davis, the competition is governed by the ITF.']
   ];
 
   const d3 = [

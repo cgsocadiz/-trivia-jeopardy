@@ -14,7 +14,7 @@ function getMusic() {
     ['Irish rock band fronted by Bono, famous for "With or Without You" and "Sunday Bloody Sunday"', 'U2', 'Have won 22 Grammy Awards, more than any other band.'],
     ['Classical German composer who went deaf later in life but composed the Ninth Symphony', 'Ludwig van Beethoven', 'His Ninth Symphony contains the famous "Ode to Joy".'],
     ['Hip-hop mogul and rapper behind "Lose Yourself" and "The Real Slim Shady"', 'Eminem (Marshall Mathers)', 'First artist to win Best Original Song at the Oscars for a rap song.'],
-    ['Pop icon known as the "Material Girl" and "Queen of Pop"', 'Madonna', 'Inducted into the Rock and Roll Hall of Fame in 2008.'],
+    ['Known as the "Queen of Rock \'n\' Roll", this powerhouse singer recorded legendary hits like "What\'s Love Got to Do with It" and "Proud Mary"', 'Tina Turner', 'Tina Turner won 12 Grammy Awards and sold over 100 million records worldwide.'],
     ['The iconic 1969 music and art festival held in Bethel, New York attended by 400,000 people', 'Woodstock Festival', 'Billed as "An Aquarian Exposition: 3 Days of Peace & Music".'],
     ['Swedish pop supergroup that won Eurovision in 1974 with "Waterloo"', 'ABBA', 'Known for global anthems like "Dancing Queen" and "Mamma Mia".'],
     ['Famous piano-playing British singer-songwriter known as the "Rocket Man"', 'Elton John', 'His single "Candle in the Wind 1997" is one of the biggest selling singles in history.'],

@@ -21,7 +21,7 @@ function getLiterature() {
     ['Epic Greek poem attributed to Homer that recounts the events of the Trojan War', 'The Iliad', 'Focuses on the rage of the warrior Achilles.'],
     ['The fantasy novella by Antoine de Saint-Exupery about a young prince who visits various planets', 'The Little Prince (Le Petit Prince)', 'One of the most translated and best-selling books in world literature.'],
     ['Author who wrote "The Shining", "Carrie", "Misery", and "Pet Sematary"', 'Stephen King', 'Often crowned the "King of Horror".'],
-    ['Gothic horror novel by Bram Stoker that introduced Count Dracula to literature in 1897', 'Dracula', 'Written in an epistolary format of letters, diary entries, and newspaper clippings.']
+    ['Gothic horror novel by Bram Stoker that introduced literature\'s most famous Transylvanian vampire in 1897', 'Dracula', 'Written in an epistolary format of letters, diary entries, and newspaper clippings.']
   ];
 
   const d2 = [
