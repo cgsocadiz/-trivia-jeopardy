@@ -304,17 +304,7 @@
           {
             "id": "cat-mvrkpw55",
             "name": "test",
-            "clues": [
-              {
-                "id": "cat-mvrkpw55-mvrkq1k9",
-                "points": 100,
-                "clue": "rh",
-                "answer": "herh",
-                "explanation": "",
-                "image": "",
-                "dailyDouble": false
-              }
-            ]
+            "clues": []
           }
         ]
       },
