@@ -163,9 +163,24 @@ const AdminApp = (function () {
     if (els.roundSelector) {
       els.roundSelector.addEventListener('change', (e) => {
         currentRoundIdx = parseInt(e.target.value, 10) || 0;
+        const prevSel = document.getElementById('preview-round-selector');
+        if (prevSel) prevSel.value = currentRoundIdx;
         currentCategoryIdx = 0;
         renderCategories();
         renderClues();
+        renderPreviewBoard();
+      });
+    }
+
+    const prevRoundSel = document.getElementById('preview-round-selector');
+    if (prevRoundSel) {
+      prevRoundSel.addEventListener('change', (e) => {
+        currentRoundIdx = parseInt(e.target.value, 10) || 0;
+        if (els.roundSelector) els.roundSelector.value = currentRoundIdx;
+        currentCategoryIdx = 0;
+        renderCategories();
+        renderClues();
+        renderPreviewBoard();
       });
     }
 
@@ -481,15 +496,19 @@ const AdminApp = (function () {
   }
 
   function populateRoundSelector() {
-    if (!els.roundSelector || !editorData || !editorData.game) return;
+    if (!editorData || !editorData.game) return;
     const rounds = editorData.game.rounds || [];
-    els.roundSelector.innerHTML = '';
-    rounds.forEach((round, idx) => {
-      const opt = document.createElement('option');
-      opt.value = idx;
-      opt.textContent = `${idx + 1}. ${round.title} (${round.categories ? round.categories.length : 0} categories)`;
-      if (idx === currentRoundIdx) opt.selected = true;
-      els.roundSelector.appendChild(opt);
+    const selectors = [els.roundSelector, document.getElementById('preview-round-selector')].filter(Boolean);
+    
+    selectors.forEach(sel => {
+      sel.innerHTML = '';
+      rounds.forEach((round, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = `${idx + 1}. ${round.title} (${round.categories ? round.categories.length : 0} categories)`;
+        if (idx === currentRoundIdx) opt.selected = true;
+        sel.appendChild(opt);
+      });
     });
   }
 
@@ -1183,9 +1202,9 @@ const AdminApp = (function () {
     }
 
     const categories = round.categories;
-    const maxClues = Math.max(...categories.map(c => (c.clues ? c.clues.length : 0)));
+    const maxClues = Math.max(1, ...categories.map(c => (c.clues ? c.clues.length : 0)));
 
-    let html = `<div class="trivia-board-table" style="--board-columns: ${categories.length}">`;
+    let html = `<div class="preview-board-wrapper"><div class="trivia-board-table" style="--board-columns: ${categories.length}">`;
     html += '<div class="trivia-board-row header-row">';
     categories.forEach(cat => {
       html += `<div class="category-header"><span class="category-title">${escapeHtml(cat.name)}</span></div>`;
@@ -1197,14 +1216,14 @@ const AdminApp = (function () {
       categories.forEach(cat => {
         const clue = cat.clues && cat.clues[r];
         if (clue) {
-          html += `<div class="clue-tile preview-tile" title="${escapeHtml(clue.clue)}"><span class="tile-value">$${clue.points}</span>${clue.dailyDouble ? ' <small class="text-warning">★</small>' : ''}</div>`;
+          html += `<div class="clue-tile preview-tile" title="${escapeHtml(clue.clue)}"><span class="tile-value">${clue.points}</span>${clue.dailyDouble ? ' <small class="text-warning">★</small>' : ''}</div>`;
         } else {
           html += '<div class="clue-tile empty-tile"></div>';
         }
       });
       html += '</div>';
     }
-    html += '</div>';
+    html += '</div></div>';
 
     els.previewBoardContainer.innerHTML = html;
   }

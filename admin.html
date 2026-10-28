@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <!-- Admin Styles -->
   <link rel="stylesheet" href="assets/css/styles.css">
-  <link rel="stylesheet" href="assets/css/admin.css">
+  <link rel="stylesheet" href="assets/css/admin.css?v=6">
 </head>
 <body class="theme-dark">
 
@@ -319,9 +319,15 @@
       <!-- TAB 4: BOARD PREVIEW -->
       <section id="tab-preview" class="admin-tab-pane d-none">
         <div class="admin-card">
-          <div class="admin-card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold"><i class="bi bi-eye text-primary me-2"></i>Live Board Preview</h5>
-            <small class="text-muted">Tiles reflect current categories and point values.</small>
+          <div class="admin-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+              <h5 class="mb-0 fw-bold"><i class="bi bi-eye text-primary me-2"></i>Live Board Preview</h5>
+              <small class="text-muted">Interactive preview of the game board for the selected round.</small>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <label for="preview-round-selector" class="small fw-bold text-muted mb-0">Round:</label>
+              <select class="form-select form-select-sm" id="preview-round-selector" style="width: auto; min-width: 200px;"></select>
+            </div>
           </div>
           <div id="admin-preview-board"></div>
         </div>
@@ -570,9 +576,9 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Local Modules -->
-  <script src="assets/js/sample-data.js?v=5"></script>
-  <script src="assets/js/password-auth.js?v=5"></script>
-  <script src="assets/js/persistence.js?v=5"></script>
-  <script src="assets/js/admin.js?v=5"></script>
+  <script src="assets/js/sample-data.js?v=6"></script>
+  <script src="assets/js/password-auth.js?v=6"></script>
+  <script src="assets/js/persistence.js?v=6"></script>
+  <script src="assets/js/admin.js?v=6"></script>
 </body>
 </html>
